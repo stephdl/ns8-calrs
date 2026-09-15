@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Create the first calrs administrator and close open registration.
+#
+# Usage: create-admin <email> <name>, password read from stdin.
+#
+# `calrs user create` has no --password option: it reads the password with
+# rpassword, hence the pseudo terminal. The command runs in an ephemeral
+# container, the calrs CLI applies pending migrations on its own.
+#
+
+import os
+import pty
+import subprocess
+import sys
+
+import agent
+
+email = sys.argv[1]
+name = sys.argv[2]
+password = sys.stdin.readline().rstrip("\n")
+
+# Redirect any output to the journal (stderr)
+sys.stdout = sys.stderr
+
+cli = [
+    "podman", "run", "--rm", "--network=none",
+    "--volume", "calrs-data:/var/lib/calrs:z",
+    os.environ["CALRS_IMAGE"],
+]
+
+
+def run_with_password(args, secret):
+    """Run a command attached to a PTY and answer its password prompt"""
+    master, slave = pty.openpty()
+    proc = subprocess.Popen(args, stdin=slave, stdout=slave, stderr=slave, close_fds=True)
+    os.close(slave)
+    os.write(master, (secret + "\n").encode())
+    output = b""
+    while True:
+        try:
+            chunk = os.read(master, 1024)
+        except OSError:
+            break
+        if not chunk:
+            break
+        output += chunk
+    os.close(master)
+    return proc.wait(), output.decode(errors="replace")
+
+
+users = subprocess.run(cli + ["-i", "-t", "user", "list"], capture_output=True, text=True)
+if users.returncode != 0:
+    print(agent.SD_ERR + "Cannot list calrs users: " + users.stderr, file=sys.stderr)
+    sys.exit(2)
+
+# An account already exists: never touch an existing installation
+if "@" in users.stdout:
+    print("A calrs account already exists: administrator creation skipped", file=sys.stderr)
+    sys.exit(0)
+
+rc, output = run_with_password(
+    cli + ["-i", "-t", "user", "create", "--email", email, "--name", name, "--admin"],
+    password,
+)
+if rc != 0:
+    print(agent.SD_ERR + "Administrator creation failed: " + output, file=sys.stderr)
+    sys.exit(2)
+print(f"Administrator {email} created", file=sys.stderr)
+
+# The upstream rule is "the first user to register becomes admin": close the door
+registration = subprocess.run(
+    cli + ["config", "auth", "--registration", "false"],
+    capture_output=True, text=True,
+)
+if registration.returncode != 0:
+    print(agent.SD_ERR + "Cannot disable registration: " + registration.stderr, file=sys.stderr)
+    sys.exit(2)
+print("Open registration disabled", file=sys.stderr)

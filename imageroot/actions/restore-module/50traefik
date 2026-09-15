@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
@@ -13,8 +13,13 @@ import os
 request = json.load(sys.stdin)
 renv = request['environment']
 
+private_hosts = renv.get("CALRS_ALLOW_PRIVATE_HOSTS", "")
+
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
     "host": renv["TRAEFIK_HOST"],
     "http2https": renv["TRAEFIK_HTTP2HTTPS"] == "True",
+    "mail_from": renv.get("CALRS_MAIL_FROM", ""),
+    "allow_private_hosts": private_hosts.split(",") if private_hosts else [],
+    "admin_email": renv.get("CALRS_ADMIN_EMAIL", ""),
 })
 agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")
