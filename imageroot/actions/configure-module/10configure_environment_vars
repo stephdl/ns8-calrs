@@ -18,7 +18,3 @@ agent.set_env("CALRS_ALLOW_PRIVATE_HOSTS", ",".join(data.get("allow_private_host
 
 # The administrator password is never stored: set_env writes to Redis in clear text
 agent.set_env("CALRS_ADMIN_EMAIL", data.get("admin_email", ""))
-
-# Make sure everything is saved inside the environment file, the next steps
-# read it back
-agent.dump_env()

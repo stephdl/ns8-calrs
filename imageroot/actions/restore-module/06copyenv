@@ -21,5 +21,3 @@ for evar in [
         "CALRS_ADMIN_EMAIL",
     ]:
     agent.set_env(evar, original_environment.get(evar, ""))
-
-agent.dump_env()

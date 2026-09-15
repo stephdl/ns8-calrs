@@ -29,11 +29,13 @@ password = sys.stdin.readline().rstrip("\n")
 # Redirect any output to the journal (stderr)
 sys.stdout = sys.stderr
 
-cli = [
-    "podman", "run", "--rm", "--network=none",
-    "--volume", "calrs-data:/var/lib/calrs:z",
-    os.environ["CALRS_IMAGE"],
-]
+def cli(*args, tty=False):
+    """Command line of an ephemeral calrs container. A TTY is needed to answer
+    the password prompt of `user create`."""
+    return [
+        "podman", "run", "--rm", "--network=none",
+        "--volume", "calrs-data:/var/lib/calrs:z",
+    ] + (["-i", "-t"] if tty else []) + [os.environ["CALRS_IMAGE"]] + list(args)
 
 
 def run_with_password(args, secret):
@@ -55,7 +57,7 @@ def run_with_password(args, secret):
     return proc.wait(), output.decode(errors="replace")
 
 
-users = subprocess.run(cli + ["-i", "-t", "user", "list"], capture_output=True, text=True)
+users = subprocess.run(cli("user", "list"), capture_output=True, text=True)
 if users.returncode != 0:
     print(agent.SD_ERR + "Cannot list calrs users: " + users.stderr, file=sys.stderr)
     sys.exit(2)
@@ -66,7 +68,7 @@ if "@" in users.stdout:
     sys.exit(0)
 
 rc, output = run_with_password(
-    cli + ["-i", "-t", "user", "create", "--email", email, "--name", name, "--admin"],
+    cli("user", "create", "--email", email, "--name", name, "--admin", tty=True),
     password,
 )
 if rc != 0:
@@ -76,7 +78,7 @@ print(f"Administrator {email} created", file=sys.stderr)
 
 # The upstream rule is "the first user to register becomes admin": close the door
 registration = subprocess.run(
-    cli + ["config", "auth", "--registration", "false"],
+    cli("config", "auth", "--registration", "false"),
     capture_output=True, text=True,
 )
 if registration.returncode != 0:
