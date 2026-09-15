@@ -21,6 +21,9 @@ The output of the command returns the instance name, for example:
 
     {"module_id": "calrs1", "image_name": "calrs", "image_url": "ghcr.io/stephdl/calrs:latest"}
 
+No release is tagged yet, so `latest` does not exist: every branch is published as
+`ghcr.io/stephdl/calrs:<branch name>`, for instance `ghcr.io/stephdl/calrs:calrs-module`.
+
 ## Configure
 
 Let's assume the instance is named `calrs1`.
@@ -70,7 +73,22 @@ environment.
 
 Further accounts are managed from the calrs admin dashboard, or with the CLI:
 
-    runagent -m calrs1 podman run --rm -it --volume calrs-data:/var/lib/calrs:z ${CALRS_IMAGE} user list
+    runagent -m calrs1 bash -c 'podman run --rm -it --volume calrs-data:/var/lib/calrs:z ${CALRS_IMAGE} user list'
+
+## Daily use
+
+1. **Connect a calendar** — Dashboard > Sources. calrs reads the CalDAV collections to
+   compute free/busy, and writes confirmed bookings back to the calendar you pick.
+2. **Create an event type** — duration, buffers, booking horizon, which calendars block
+   availability.
+3. **Share the link** — `https://<host>/u/<username>/<slug>`, or `/u/<username>` for the
+   whole list. Guests pick a slot and leave a name and an email: no account, no
+   registration. They get a confirmation mail with a cancellation link.
+
+A CalDAV server on a private address (an internal SOGo or Nextcloud) is refused by the
+calrs SSRF guard until its host name is listed in `allow_private_hosts`. With `ns8-sogo`,
+also set `dav: true` in its own configuration: the flag drives
+`SOGoCalendarDAVAccessEnabled`, and CalDAV is closed while it is false.
 
 ## Get the configuration
 
@@ -130,7 +148,12 @@ Inspect the containers:
 ```
 runagent -m calrs1 podman ps
 runagent -m calrs1 podman exec calrs-app env
-runagent -m calrs1 journalctl --user -u calrs-app -f
+```
+
+The module user cannot read the journal, so follow the logs as root:
+
+```
+journalctl -t calrs-app -f
 ```
 
 ## Testing

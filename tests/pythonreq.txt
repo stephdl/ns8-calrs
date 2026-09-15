@@ -1,2 +1,4 @@
-robotframework
+# RETURN and inline IF need Robot Framework 5 or later: the runner image ships an
+# older release, and an unpinned requirement leaves it in place.
+robotframework>=7.0
 robotframework-sshlibrary

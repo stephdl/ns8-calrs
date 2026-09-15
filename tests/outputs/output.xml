@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.5 (Python 3.8.10 on linux)" generated="2026-09-15T22:20:37.101210" rpa="false" schemaversion="5">
+<suite id="s1" name="Tests" source="/home/pwuser/ns8-module/tests">
+<kw name="Connect to the node" type="SETUP">
+<kw name="Open Connection" owner="SSHLibrary">
+<arg>${NODE_ADDR}</arg>
+<doc>Opens a new SSH connection to the given ``host`` and ``port``.</doc>
+<status status="PASS" start="2026-09-15T22:20:37.162984" elapsed="0.000200"/>
+</kw>
+<kw name="Login With Public Key" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:37.163495" level="INFO">Logging into 'rocky9-pve.org:22' as 'root'.</msg>
+<msg time="2026-09-15T22:20:38.371553" level="INFO">Read output: 
+NethServer cluster-admin UI:
+  - https://R1-pve.rocky9-pve.org/cluster-admin/
+  - https://192.168.12.110/cluster-admin/
+
+Last login: Wed Sep 16 00:19:26 2026 from 192.168.13.25
+[?2004h[root@R1-pve ~]#</msg>
+<arg>root</arg>
+<arg>${SSH_KEYFILE}</arg>
+<doc>Logs into the SSH server using key-based authentication.</doc>
+<status status="PASS" start="2026-09-15T22:20:37.163345" elapsed="1.208365"/>
+</kw>
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:38.372173" level="INFO">Executing command 'systemctl is-system-running'.</msg>
+<msg time="2026-09-15T22:20:38.400225" level="INFO">Command exited with return code 1.</msg>
+<msg time="2026-09-15T22:20:38.400548" level="INFO">${output} = degraded</msg>
+<var>${output}</var>
+<arg>systemctl is-system-running</arg>
+<arg>--wait</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:38.371972" elapsed="0.028602"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>'${output}' == 'running' or '${output}' == 'degraded'</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-09-15T22:20:38.400782" elapsed="0.000510"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:37.162504" elapsed="1.238854"/>
+</kw>
+<suite id="s1-s1" name="Calrs" source="/home/pwuser/ns8-module/tests/calrs.robot">
+<test id="s1-s1-t1" name="Check if calrs is installed correctly" line="33">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:38.405273" level="INFO">Executing command 'add-module ghcr.io/stephdl/calrs:calrs-module 1'.</msg>
+<msg time="2026-09-15T22:20:46.131712" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:46.131938" level="INFO">${output} = {'module_id': 'calrs5', 'module_uuid': '3bba44ec-c83e-4317-be39-813cb1732764', 'image_name': 'calrs', 'image_url': 'ghcr.io/stephdl/calrs:calrs-module'}</msg>
+<msg time="2026-09-15T22:20:46.131977" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>add-module ${IMAGE_URL} 1</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:38.405125" elapsed="7.726872"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:46.132577" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:46.132196" elapsed="0.000435"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-09-15T22:20:46.133116" level="INFO">&amp;{output} = { module_id=calrs5 | module_uuid=3bba44ec-c83e-4317-be39-813cb1732764 | image_name=calrs | image_url=ghcr.io/stephdl/calrs:calrs-module }</msg>
+<var>&amp;{output}</var>
+<arg>${output}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-09-15T22:20:46.132756" elapsed="0.000383"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-09-15T22:20:46.133798" level="INFO">${module_id} = calrs5</msg>
+<arg>${module_id}</arg>
+<arg>${output.module_id}</arg>
+<doc>Makes the variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-09-15T22:20:46.133273" elapsed="0.000562"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:38.404765" elapsed="7.729168"/>
+</test>
+<test id="s1-s1-t2" name="Check if calrs can be configured" line="40">
+<kw name="Run task" owner="api">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:46.135120" level="INFO">Executing command 'api-cli run module/calrs5/configure-module --data '{"host":"calrs.ns8-ci.test","http2https":false,"lets_encrypt":false,"admin_email":"admin@ns8-ci.test","admin_name":"Administrator","admin_password":"Nethesis,1234"}''.</msg>
+<msg time="2026-09-15T22:20:53.014454" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:53.014680" level="INFO">${stdout} = ""</msg>
+<msg time="2026-09-15T22:20:53.014723" level="INFO">${stderr} = </msg>
+<msg time="2026-09-15T22:20:53.014753" level="INFO">${rc} = 0</msg>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<var>${rc}</var>
+<arg>api-cli run ${action} --data '${input}'</arg>
+<arg>return_stdout=True</arg>
+<arg>return_stderr=True</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:46.134931" elapsed="6.879841"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:53.015434" level="INFO">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'int'&gt;</msg>
+<arg>${rc_expected}</arg>
+<arg>${rc}</arg>
+<arg>Run task ${action} failed!${\n}${stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.014989" elapsed="0.000513"/>
+</kw>
+<if>
+<branch type="IF" condition="${decode_json} and len($stdout) &gt; 0">
+<kw name="Evaluate" owner="BuiltIn">
+<var>${response}</var>
+<arg>json.loads('''${stdout}''')</arg>
+<arg>modules=json</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-09-15T22:20:53.018111" elapsed="0.000025"/>
+</kw>
+<status status="NOT RUN" start="2026-09-15T22:20:53.015608" elapsed="0.002571"/>
+</branch>
+<branch type="ELSE">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-09-15T22:20:53.018642" level="INFO">${response} = ""</msg>
+<var>${response}</var>
+<arg>${stdout}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.018310" elapsed="0.000355"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:53.018204" elapsed="0.000489"/>
+</branch>
+<status status="PASS" start="2026-09-15T22:20:53.015576" elapsed="0.003133"/>
+</if>
+<return>
+<value>${response}</value>
+<status status="PASS" start="2026-09-15T22:20:53.018743" elapsed="0.000035"/>
+</return>
+<arg>module/${module_id}/configure-module</arg>
+<arg>{"host":"${TEST_HOST}","http2https":false,"lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}</arg>
+<arg>decode_json=${FALSE}</arg>
+<status status="PASS" start="2026-09-15T22:20:46.134519" elapsed="6.884332"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:46.134094" elapsed="6.884860"/>
+</test>
+<test id="s1-s1-t3" name="Check if calrs configuration reads back" line="45">
+<kw name="Run task" owner="api">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:53.020158" level="INFO">Executing command 'api-cli run module/calrs5/get-configuration --data '{}''.</msg>
+<msg time="2026-09-15T22:20:53.853173" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:53.853405" level="INFO">${stdout} = {"host": "calrs.ns8-ci.test", "http2https": false, "lets_encrypt": false, "mail_from": "", "allow_private_hosts": [], "admin_email": "admin@ns8-ci.test"}</msg>
+<msg time="2026-09-15T22:20:53.853447" level="INFO">${stderr} = </msg>
+<msg time="2026-09-15T22:20:53.853482" level="INFO">${rc} = 0</msg>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<var>${rc}</var>
+<arg>api-cli run ${action} --data '${input}'</arg>
+<arg>return_stdout=True</arg>
+<arg>return_stderr=True</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.019960" elapsed="0.833540"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:53.854188" level="INFO">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'int'&gt;</msg>
+<arg>${rc_expected}</arg>
+<arg>${rc}</arg>
+<arg>Run task ${action} failed!${\n}${stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.853770" elapsed="0.000479"/>
+</kw>
+<if>
+<branch type="IF" condition="${decode_json} and len($stdout) &gt; 0">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-09-15T22:20:53.854986" level="INFO">${response} = {'host': 'calrs.ns8-ci.test', 'http2https': False, 'lets_encrypt': False, 'mail_from': '', 'allow_private_hosts': [], 'admin_email': 'admin@ns8-ci.test'}</msg>
+<var>${response}</var>
+<arg>json.loads('''${stdout}''')</arg>
+<arg>modules=json</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.854640" elapsed="0.000370"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:53.854348" elapsed="0.000695"/>
+</branch>
+<branch type="ELSE">
+<kw name="Set Variable" owner="BuiltIn">
+<var>${response}</var>
+<arg>${stdout}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="NOT RUN" start="2026-09-15T22:20:53.855159" elapsed="0.000014"/>
+</kw>
+<status status="NOT RUN" start="2026-09-15T22:20:53.855065" elapsed="0.000132"/>
+</branch>
+<status status="PASS" start="2026-09-15T22:20:53.854320" elapsed="0.000890"/>
+</if>
+<return>
+<value>${response}</value>
+<status status="PASS" start="2026-09-15T22:20:53.855238" elapsed="0.000030"/>
+</return>
+<msg time="2026-09-15T22:20:53.855383" level="INFO">${config} = {'host': 'calrs.ns8-ci.test', 'http2https': False, 'lets_encrypt': False, 'mail_from': '', 'allow_private_hosts': [], 'admin_email': 'admin@ns8-ci.test'}</msg>
+<var>${config}</var>
+<arg>module/${module_id}/get-configuration</arg>
+<arg>{}</arg>
+<status status="PASS" start="2026-09-15T22:20:53.019600" elapsed="0.835802"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${config}[host]</arg>
+<arg>${TEST_HOST}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.855522" elapsed="0.000237"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${config}[admin_email]</arg>
+<arg>${ADMIN_EMAIL}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.855877" elapsed="0.000216"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:53.019124" elapsed="0.837065"/>
+</test>
+<test id="s1-s1-t4" name="Check if calrs services are running" line="50">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:53.856896" level="INFO">Executing command 'runagent -m calrs5 systemctl --user is-active calrs.service calrs-app.service'.</msg>
+<msg time="2026-09-15T22:20:54.229987" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:54.230222" level="INFO">${output} = active
+active</msg>
+<msg time="2026-09-15T22:20:54.230263" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} systemctl --user is-active calrs.service calrs-app.service</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:53.856724" elapsed="0.373578"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:54.230854" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.230509" elapsed="0.000400"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>inactive</arg>
+<doc>Fails if the `container` contains the `item`.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.231016" elapsed="0.000386"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:53.856372" elapsed="0.375142"/>
+</test>
+<test id="s1-s1-t5" name="Check if calrs answers on its port" line="57">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:54.232250" level="INFO">Executing command 'runagent -m calrs5 bash -c 'curl -fs -o /dev/null http://127.0.0.1:${TCP_PORT}/auth/login''.</msg>
+<msg time="2026-09-15T22:20:54.615081" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:54.615324" level="INFO">${rc} = 0</msg>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} bash -c 'curl -fs -o /dev/null http://127.0.0.1:\${TCP_PORT}/auth/login'</arg>
+<arg>return_rc=True</arg>
+<arg>return_stdout=False</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.232070" elapsed="0.383285"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:54.615893" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.615563" elapsed="0.000389"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:54.231682" elapsed="0.384376"/>
+</test>
+<test id="s1-s1-t6" name="Check if the sign in page is served through Traefik" line="64">
+<kw name="Fetch page">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:54.617086" level="INFO">Executing command 'curl -fkL -H "Host: calrs.ns8-ci.test" https://127.0.0.1/'.</msg>
+<msg time="2026-09-15T22:20:54.705329" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:54.705627" level="INFO">${output} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  
+  
+  &lt;meta name="color-scheme" content="light dark"&gt;
+  
+  &lt;ti...</msg>
+<msg time="2026-09-15T22:20:54.705669" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>curl -fkL -H "Host: ${TEST_HOST}" https://127.0.0.1${path}</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.616926" elapsed="0.088763"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:54.706219" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.705890" elapsed="0.000386"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-09-15T22:20:54.706347" elapsed="0.000037"/>
+</return>
+<msg time="2026-09-15T22:20:54.706530" level="INFO">${output} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  
+  
+  &lt;meta name="color-scheme" content="light dark"&gt;
+  
+  &lt;ti...</msg>
+<var>${output}</var>
+<arg>/</arg>
+<doc>Fetch a page through Traefik, following the redirect to the sign in page</doc>
+<status status="PASS" start="2026-09-15T22:20:54.616643" elapsed="0.089909"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Sign in</arg>
+<doc>Fails if the `container` does not contain the `item` one or more times.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.706659" elapsed="0.000249"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Powered by</arg>
+<doc>Fails if the `container` does not contain the `item` one or more times.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.707008" elapsed="0.000209"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>/auth/register</arg>
+<doc>Fails if the `container` contains the `item`.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.707391" elapsed="0.000212"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:54.616227" elapsed="0.091479"/>
+</test>
+<test id="s1-s1-t7" name="Check if the administrator account exists" line="71">
+<kw name="Run calrs cli">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:54.708904" level="INFO">Executing command 'runagent -m calrs5 bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z ${CALRS_IMAGE} user list''.</msg>
+<msg time="2026-09-15T22:20:55.312867" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:20:55.313104" level="INFO">${output} = +-------------------+---------------+-------+----------+---------+---------------------+
+| email             | name          | role  | provider | enabled | created             |
++-------------------+-...</msg>
+<msg time="2026-09-15T22:20:55.313145" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z \${CALRS_IMAGE} ${arguments}'</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:54.708712" elapsed="0.604453"/>
+</kw>
+<return>
+<value>${output}</value>
+<value>${rc}</value>
+<status status="PASS" start="2026-09-15T22:20:55.313250" elapsed="0.000067"/>
+</return>
+<msg time="2026-09-15T22:20:55.313469" level="INFO">${output} = +-------------------+---------------+-------+----------+---------+---------------------+
+| email             | name          | role  | provider | enabled | created             |
++-------------------+-...</msg>
+<msg time="2026-09-15T22:20:55.313501" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>user list</arg>
+<doc>Run the calrs CLI in an ephemeral container on the module volume</doc>
+<status status="PASS" start="2026-09-15T22:20:54.708455" elapsed="0.605063"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:20:55.313979" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:20:55.313675" elapsed="0.000355"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${ADMIN_EMAIL}</arg>
+<doc>Fails if the `container` does not contain the `item` one or more times.</doc>
+<status status="PASS" start="2026-09-15T22:20:55.314133" elapsed="0.000267"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:54.707862" elapsed="0.606643"/>
+</test>
+<test id="s1-s1-t8" name="Check if a second configuration keeps a single administrator" line="76">
+<kw name="Run task" owner="api">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:20:55.315704" level="INFO">Executing command 'api-cli run module/calrs5/configure-module --data '{"host":"calrs.ns8-ci.test","http2https":false,"lets_encrypt":false,"admin_email":"admin@ns8-ci.test","admin_name":"Administrator","admin_password":"Nethesis,1234"}''.</msg>
+<msg time="2026-09-15T22:21:01.080665" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:01.080899" level="INFO">${stdout} = ""</msg>
+<msg time="2026-09-15T22:21:01.080939" level="INFO">${stderr} = </msg>
+<msg time="2026-09-15T22:21:01.080972" level="INFO">${rc} = 0</msg>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<var>${rc}</var>
+<arg>api-cli run ${action} --data '${input}'</arg>
+<arg>return_stdout=True</arg>
+<arg>return_stderr=True</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:20:55.315533" elapsed="5.765458"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:01.081631" level="INFO">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'int'&gt;</msg>
+<arg>${rc_expected}</arg>
+<arg>${rc}</arg>
+<arg>Run task ${action} failed!${\n}${stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.081194" elapsed="0.000490"/>
+</kw>
+<if>
+<branch type="IF" condition="${decode_json} and len($stdout) &gt; 0">
+<kw name="Evaluate" owner="BuiltIn">
+<var>${response}</var>
+<arg>json.loads('''${stdout}''')</arg>
+<arg>modules=json</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-09-15T22:21:01.082035" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2026-09-15T22:21:01.081764" elapsed="0.000318"/>
+</branch>
+<branch type="ELSE">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-09-15T22:21:01.082458" level="INFO">${response} = ""</msg>
+<var>${response}</var>
+<arg>${stdout}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.082182" elapsed="0.000298"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:01.082102" elapsed="0.000406"/>
+</branch>
+<status status="PASS" start="2026-09-15T22:21:01.081742" elapsed="0.000780"/>
+</if>
+<return>
+<value>${response}</value>
+<status status="PASS" start="2026-09-15T22:21:01.082551" elapsed="0.000030"/>
+</return>
+<arg>module/${module_id}/configure-module</arg>
+<arg>{"host":"${TEST_HOST}","http2https":false,"lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}</arg>
+<arg>decode_json=${FALSE}</arg>
+<status status="PASS" start="2026-09-15T22:20:55.315114" elapsed="5.767539"/>
+</kw>
+<kw name="Run calrs cli">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:01.083259" level="INFO">Executing command 'runagent -m calrs5 bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z ${CALRS_IMAGE} user list''.</msg>
+<msg time="2026-09-15T22:21:01.693207" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:01.693443" level="INFO">${output} = +-------------------+---------------+-------+----------+---------+---------------------+
+| email             | name          | role  | provider | enabled | created             |
++-------------------+-...</msg>
+<msg time="2026-09-15T22:21:01.693484" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z \${CALRS_IMAGE} ${arguments}'</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.083071" elapsed="0.610434"/>
+</kw>
+<return>
+<value>${output}</value>
+<value>${rc}</value>
+<status status="PASS" start="2026-09-15T22:21:01.693589" elapsed="0.000045"/>
+</return>
+<msg time="2026-09-15T22:21:01.693780" level="INFO">${output} = +-------------------+---------------+-------+----------+---------+---------------------+
+| email             | name          | role  | provider | enabled | created             |
++-------------------+-...</msg>
+<msg time="2026-09-15T22:21:01.693814" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>user list</arg>
+<doc>Run the calrs CLI in an ephemeral container on the module volume</doc>
+<status status="PASS" start="2026-09-15T22:21:01.082806" elapsed="0.611024"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:01.694341" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.693984" elapsed="0.000410"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-09-15T22:21:01.694842" level="INFO">${accounts} = 1</msg>
+<var>${accounts}</var>
+<arg>$output.count("@")</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.694511" elapsed="0.000414"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:01.695219" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${accounts}</arg>
+<arg>1</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.695030" elapsed="0.000231"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:20:55.314670" elapsed="6.380710"/>
+</test>
+<test id="s1-s1-t9" name="Check if a short administrator password is refused" line="85">
+<kw name="Run task" owner="api">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:01.696602" level="INFO">Executing command 'api-cli run module/calrs5/configure-module --data '{"host":"calrs.ns8-ci.test","http2https":false,"lets_encrypt":false,"admin_email":"admin@ns8-ci.test","admin_name":"Administrator","admin_password":"short"}''.</msg>
+<msg time="2026-09-15T22:21:02.131031" level="INFO">Command exited with return code 10.</msg>
+<msg time="2026-09-15T22:21:02.131252" level="INFO">${stdout} = [{"parameter": "admin_password", "error": "admin_password_string_gte", "value": "short", "field": "admin_password"}]</msg>
+<msg time="2026-09-15T22:21:02.131344" level="INFO">${stderr} = Validation errors: [admin_password: String length must be greater than or equal to 12]</msg>
+<msg time="2026-09-15T22:21:02.131414" level="INFO">${rc} = 10</msg>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<var>${rc}</var>
+<arg>api-cli run ${action} --data '${input}'</arg>
+<arg>return_stdout=True</arg>
+<arg>return_stderr=True</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:01.696423" elapsed="0.435018"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:02.132058" level="INFO">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'int'&gt;</msg>
+<arg>${rc_expected}</arg>
+<arg>${rc}</arg>
+<arg>Run task ${action} failed!${\n}${stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:02.131647" elapsed="0.000478"/>
+</kw>
+<if>
+<branch type="IF" condition="${decode_json} and len($stdout) &gt; 0">
+<kw name="Evaluate" owner="BuiltIn">
+<var>${response}</var>
+<arg>json.loads('''${stdout}''')</arg>
+<arg>modules=json</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-09-15T22:21:02.132495" elapsed="0.000018"/>
+</kw>
+<status status="NOT RUN" start="2026-09-15T22:21:02.132207" elapsed="0.000337"/>
+</branch>
+<branch type="ELSE">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-09-15T22:21:02.132877" level="INFO">${response} = [{"parameter": "admin_password", "error": "admin_password_string_gte", "value": "short", "field": "admin_password"}]</msg>
+<var>${response}</var>
+<arg>${stdout}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-09-15T22:21:02.132646" elapsed="0.000252"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:02.132565" elapsed="0.000361"/>
+</branch>
+<status status="PASS" start="2026-09-15T22:21:02.132186" elapsed="0.000756"/>
+</if>
+<return>
+<value>${response}</value>
+<status status="PASS" start="2026-09-15T22:21:02.132973" elapsed="0.000030"/>
+</return>
+<msg time="2026-09-15T22:21:02.133101" level="INFO">${errors} = [{"parameter": "admin_password", "error": "admin_password_string_gte", "value": "short", "field": "admin_password"}]</msg>
+<var>${errors}</var>
+<arg>module/${module_id}/configure-module</arg>
+<arg>{"host":"${TEST_HOST}","http2https":false,"lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"short"}</arg>
+<arg>decode_json=${FALSE}</arg>
+<arg>rc_expected=10</arg>
+<status status="PASS" start="2026-09-15T22:21:01.695984" elapsed="0.437135"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${errors}</arg>
+<arg>admin_password</arg>
+<doc>Fails if the `container` does not contain the `item` one or more times.</doc>
+<status status="PASS" start="2026-09-15T22:21:02.133230" elapsed="0.000248"/>
+</kw>
+<kw name="Run task" owner="api">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:02.134441" level="INFO">Executing command 'api-cli run module/calrs5/get-configuration --data '{}''.</msg>
+<msg time="2026-09-15T22:21:03.006453" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:03.006678" level="INFO">${stdout} = {"host": "calrs.ns8-ci.test", "http2https": false, "lets_encrypt": false, "mail_from": "", "allow_private_hosts": [], "admin_email": "admin@ns8-ci.test"}</msg>
+<msg time="2026-09-15T22:21:03.006720" level="INFO">${stderr} = </msg>
+<msg time="2026-09-15T22:21:03.006751" level="INFO">${rc} = 0</msg>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<var>${rc}</var>
+<arg>api-cli run ${action} --data '${input}'</arg>
+<arg>return_stdout=True</arg>
+<arg>return_stderr=True</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:02.134249" elapsed="0.872521"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:03.007404" level="INFO">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'int'&gt;</msg>
+<arg>${rc_expected}</arg>
+<arg>${rc}</arg>
+<arg>Run task ${action} failed!${\n}${stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.006979" elapsed="0.000478"/>
+</kw>
+<if>
+<branch type="IF" condition="${decode_json} and len($stdout) &gt; 0">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-09-15T22:21:03.008139" level="INFO">${response} = {'host': 'calrs.ns8-ci.test', 'http2https': False, 'lets_encrypt': False, 'mail_from': '', 'allow_private_hosts': [], 'admin_email': 'admin@ns8-ci.test'}</msg>
+<var>${response}</var>
+<arg>json.loads('''${stdout}''')</arg>
+<arg>modules=json</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.007811" elapsed="0.000351"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:03.007539" elapsed="0.000655"/>
+</branch>
+<branch type="ELSE">
+<kw name="Set Variable" owner="BuiltIn">
+<var>${response}</var>
+<arg>${stdout}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="NOT RUN" start="2026-09-15T22:21:03.008314" elapsed="0.000015"/>
+</kw>
+<status status="NOT RUN" start="2026-09-15T22:21:03.008215" elapsed="0.000138"/>
+</branch>
+<status status="PASS" start="2026-09-15T22:21:03.007517" elapsed="0.000850"/>
+</if>
+<return>
+<value>${response}</value>
+<status status="PASS" start="2026-09-15T22:21:03.008395" elapsed="0.000028"/>
+</return>
+<msg time="2026-09-15T22:21:03.008521" level="INFO">${config} = {'host': 'calrs.ns8-ci.test', 'http2https': False, 'lets_encrypt': False, 'mail_from': '', 'allow_private_hosts': [], 'admin_email': 'admin@ns8-ci.test'}</msg>
+<var>${config}</var>
+<arg>module/${module_id}/get-configuration</arg>
+<arg>{}</arg>
+<status status="PASS" start="2026-09-15T22:21:02.133882" elapsed="0.874657"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${config}[host]</arg>
+<arg>${TEST_HOST}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.008655" elapsed="0.000228"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:01.695539" elapsed="1.313443"/>
+</test>
+<test id="s1-s1-t10" name="Check if the guest booking page offers slots" line="94">
+<kw name="Run calrs cli">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:03.010103" level="INFO">Executing command 'runagent -m calrs5 bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z ${CALRS_IMAGE} event-type create --title "CI booking" --slug ci-booking --duration 30''.</msg>
+<msg time="2026-09-15T22:21:03.631048" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:03.631268" level="INFO">${output} = ✓ Event type 'CI booking' created (slug: ci-booking, 30min)
+Default availability: Mon–Fri 09:00–17:00. View slots with `calrs event-type slots`.</msg>
+<msg time="2026-09-15T22:21:03.631326" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z \${CALRS_IMAGE} ${arguments}'</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.009899" elapsed="0.621459"/>
+</kw>
+<return>
+<value>${output}</value>
+<value>${rc}</value>
+<status status="PASS" start="2026-09-15T22:21:03.631467" elapsed="0.000051"/>
+</return>
+<msg time="2026-09-15T22:21:03.631697" level="INFO">${output} = ✓ Event type 'CI booking' created (slug: ci-booking, 30min)
+Default availability: Mon–Fri 09:00–17:00. View slots with `calrs event-type slots`.</msg>
+<msg time="2026-09-15T22:21:03.631741" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>event-type create --title "CI booking" --slug ${EVENT_SLUG} --duration 30</arg>
+<doc>Run the calrs CLI in an ephemeral container on the module volume</doc>
+<status status="PASS" start="2026-09-15T22:21:03.009581" elapsed="0.622178"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:03.632336" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.631964" elapsed="0.000430"/>
+</kw>
+<kw name="Fetch page">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:03.633013" level="INFO">Executing command 'curl -fkL -H "Host: calrs.ns8-ci.test" https://127.0.0.1/u/admin'.</msg>
+<msg time="2026-09-15T22:21:03.690031" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:03.690327" level="INFO">${output} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  
+  
+  &lt;meta name="color-scheme" content="light dark"&gt;
+  
+  &lt;ti...</msg>
+<msg time="2026-09-15T22:21:03.690453" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>curl -fkL -H "Host: ${TEST_HOST}" https://127.0.0.1${path}</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.632861" elapsed="0.057620"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:03.691012" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.690683" elapsed="0.000381"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-09-15T22:21:03.691107" elapsed="0.000037"/>
+</return>
+<msg time="2026-09-15T22:21:03.691301" level="INFO">${profile} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  
+  
+  &lt;meta name="color-scheme" content="light dark"&gt;
+  
+  &lt;ti...</msg>
+<var>${profile}</var>
+<arg>/u/${ADMIN_USERNAME}</arg>
+<doc>Fetch a page through Traefik, following the redirect to the sign in page</doc>
+<status status="PASS" start="2026-09-15T22:21:03.632565" elapsed="0.058759"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${profile}</arg>
+<arg>${EVENT_SLUG}</arg>
+<doc>Fails if the `container` does not contain the `item` one or more times.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.691434" elapsed="0.000263"/>
+</kw>
+<kw name="Fetch page">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:03.692363" level="INFO">Executing command 'curl -fkL -H "Host: calrs.ns8-ci.test" https://127.0.0.1/u/admin/ci-booking'.</msg>
+<msg time="2026-09-15T22:21:03.750664" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:03.751039" level="INFO">${output} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  
+  
+  &lt;meta name="color-scheme" content="light dark"&gt;
+  
+  &lt;ti...</msg>
+<msg time="2026-09-15T22:21:03.751084" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>curl -fkL -H "Host: ${TEST_HOST}" https://127.0.0.1${path}</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.692162" elapsed="0.058943"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:03.751635" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.751308" elapsed="0.000379"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-09-15T22:21:03.751731" elapsed="0.000037"/>
+</return>
+<msg time="2026-09-15T22:21:03.752048" level="INFO">${page} = &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  
+  
+  &lt;meta name="color-scheme" content="light dark"&gt;
+  
+  &lt;ti...</msg>
+<var>${page}</var>
+<arg>/u/${ADMIN_USERNAME}/${EVENT_SLUG}</arg>
+<doc>Fetch a page through Traefik, following the redirect to the sign in page</doc>
+<status status="PASS" start="2026-09-15T22:21:03.691857" elapsed="0.060214"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${page}</arg>
+<arg>/book?date=</arg>
+<doc>Fails if the `container` does not contain the `item` one or more times.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.752184" elapsed="0.000288"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:03.009147" elapsed="0.743433"/>
+</test>
+<test id="s1-s1-t11" name="Check if the database dump is consistent" line="104">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:03.753274" level="INFO">Executing command 'runagent -m calrs5 module-dump-state'.</msg>
+<msg time="2026-09-15T22:21:04.269385" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:04.269593" level="INFO">${rc} = 0</msg>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} module-dump-state</arg>
+<arg>return_rc=True</arg>
+<arg>return_stdout=False</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:03.753099" elapsed="0.516518"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:04.270152" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:04.269819" elapsed="0.000385"/>
+</kw>
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:04.270508" level="INFO">Executing command 'runagent -m calrs5 python3 -c "import os, sqlite3; print(sqlite3.connect(os.environ['AGENT_STATE_DIR'] + '/calrs-backup.db').execute('PRAGMA integrity_check').fetchone()[0])"'.</msg>
+<msg time="2026-09-15T22:21:04.689550" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:04.689782" level="INFO">${output} = ok</msg>
+<msg time="2026-09-15T22:21:04.689895" level="INFO">${rc} = 0</msg>
+<var>${output}</var>
+<var>${rc}</var>
+<arg>runagent -m ${module_id} python3 -c "import os, sqlite3; print(sqlite3.connect(os.environ['AGENT_STATE_DIR'] + '/calrs-backup.db').execute('PRAGMA integrity_check').fetchone()[0])"</arg>
+<arg>return_rc=True</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:04.270348" elapsed="0.419569"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:04.690486" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:04.690121" elapsed="0.000423"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>ok</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-09-15T22:21:04.690669" elapsed="0.000221"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:03.752746" elapsed="0.938250"/>
+</test>
+<test id="s1-s1-t12" name="Check if calrs is removed correctly" line="114">
+<kw name="Execute Command" owner="SSHLibrary">
+<msg time="2026-09-15T22:21:04.691698" level="INFO">Executing command 'remove-module --no-preserve calrs5'.</msg>
+<msg time="2026-09-15T22:21:06.560033" level="INFO">Command exited with return code 0.</msg>
+<msg time="2026-09-15T22:21:06.560244" level="INFO">${rc} = 0</msg>
+<var>${rc}</var>
+<arg>remove-module --no-preserve ${module_id}</arg>
+<arg>return_rc=True</arg>
+<arg>return_stdout=False</arg>
+<doc>Executes ``command`` on the remote machine and returns its outputs.</doc>
+<status status="PASS" start="2026-09-15T22:21:04.691522" elapsed="1.868747"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-09-15T22:21:06.560809" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-09-15T22:21:06.560484" elapsed="0.000377"/>
+</kw>
+<status status="PASS" start="2026-09-15T22:21:04.691159" elapsed="1.869810"/>
+</test>
+<status status="PASS" start="2026-09-15T22:20:38.401417" elapsed="28.159928"/>
+</suite>
+<status status="PASS" start="2026-09-15T22:20:37.103457" elapsed="29.458278"/>
+</suite>
+<statistics>
+<total>
+<stat pass="12" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Tests" id="s1" pass="12" fail="0" skip="0">Tests</stat>
+<stat name="Calrs" id="s1-s1" pass="12" fail="0" skip="0">Tests.Calrs</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
