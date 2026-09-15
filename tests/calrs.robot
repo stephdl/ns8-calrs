@@ -37,8 +37,9 @@ Check if calrs services are running
     Should Not Contain    ${output}    inactive
 
 Check if calrs answers on its port
+    # / redirects to the sign in page
     ${output}  ${rc} =    Execute Command
-    ...    runagent -m ${module_id} bash -c 'curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:\${TCP_PORT}/'
+    ...    runagent -m ${module_id} bash -c 'curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:\${TCP_PORT}/auth/login'
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     Should Be Equal    ${output}    200
