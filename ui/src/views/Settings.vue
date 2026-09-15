@@ -33,6 +33,16 @@
               ref="host"
             >
             </cv-text-input>
+            <NsTextInput
+              :label="$t('settings.mail_from')"
+              placeholder="noreply@calrs.example.org"
+              v-model.trim="mailFrom"
+              :helper-text="$t('settings.mail_from_helper')"
+              :invalid-message="$t(error.mail_from)"
+              :disabled="stillLoading"
+              class="mg-bottom"
+              ref="mail_from"
+            ></NsTextInput>
             <NsToggle
               value="letsEncrypt"
               :label="core.$t('apps_lets_encrypt.request_https_certificate')"
@@ -94,11 +104,69 @@
                 $t("settings.enabled")
               }}</template>
             </cv-toggle>
+            <template v-if="!isAdminConfigured">
+              <h4 class="mg-bottom">{{ $t("settings.admin_account") }}</h4>
+              <NsInlineNotification
+                kind="info"
+                :title="$t('settings.admin_account')"
+                :description="$t('settings.admin_account_info')"
+                :showCloseButton="false"
+                class="mg-bottom maxwidth"
+              />
+              <cv-text-input
+                :label="$t('settings.admin_email')"
+                placeholder="admin@example.org"
+                v-model.trim="adminEmail"
+                class="mg-bottom"
+                :invalid-message="$t(error.admin_email)"
+                :disabled="stillLoading"
+                ref="admin_email"
+              >
+              </cv-text-input>
+              <cv-text-input
+                :label="$t('settings.admin_name')"
+                v-model.trim="adminName"
+                class="mg-bottom"
+                :invalid-message="$t(error.admin_name)"
+                :disabled="stillLoading"
+                ref="admin_name"
+              >
+              </cv-text-input>
+              <NsTextInput
+                :label="$t('settings.admin_password')"
+                v-model="adminPassword"
+                :helper-text="$t('settings.admin_password_helper')"
+                :invalid-message="$t(error.admin_password)"
+                :disabled="stillLoading"
+                type="password"
+                minlength="12"
+                class="mg-bottom"
+                ref="admin_password"
+              ></NsTextInput>
+              <NsTextInput
+                :label="$t('settings.admin_password_confirm')"
+                v-model="adminPasswordConfirm"
+                :invalid-message="$t(error.adminPasswordConfirm)"
+                :disabled="stillLoading"
+                type="password"
+                class="mg-bottom"
+                ref="adminPasswordConfirm"
+              ></NsTextInput>
+            </template>
             <!-- advanced options -->
             <cv-accordion ref="accordion" class="maxwidth mg-bottom">
               <cv-accordion-item :open="toggleAccordion[0]">
                 <template slot="title">{{ $t("settings.advanced") }}</template>
-                <template slot="content"> </template>
+                <template slot="content">
+                  <NsTextInput
+                    :label="$t('settings.allow_private_hosts')"
+                    v-model.trim="allowPrivateHosts"
+                    :helper-text="$t('settings.allow_private_hosts_helper')"
+                    :invalid-message="$t(error.allow_private_hosts)"
+                    :disabled="stillLoading"
+                    ref="allow_private_hosts"
+                  ></NsTextInput>
+                </template>
               </cv-accordion-item>
             </cv-accordion>
             <cv-row v-if="error.configureModule">
@@ -189,6 +257,13 @@ export default {
       validationErrorDetails: [],
       urlCheckInterval: null,
       host: "",
+      mailFrom: "",
+      allowPrivateHosts: "",
+      adminEmail: "",
+      adminName: "",
+      adminPassword: "",
+      adminPasswordConfirm: "",
+      isAdminConfigured: false,
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
       isHttpToHttpsEnabled: true,
@@ -203,6 +278,12 @@ export default {
         host: "",
         lets_encrypt: "",
         http2https: "",
+        mail_from: "",
+        allow_private_hosts: "",
+        admin_email: "",
+        admin_name: "",
+        admin_password: "",
+        adminPasswordConfirm: "",
         getStatus: "",
       },
     };
@@ -325,6 +406,10 @@ export default {
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
       this.isHttpToHttpsEnabled = config.http2https;
+      this.mailFrom = config.mail_from;
+      this.allowPrivateHosts = config.allow_private_hosts.join(", ");
+      this.adminEmail = config.admin_email;
+      this.isAdminConfigured = !!config.admin_email;
 
       this.loading.getConfiguration = false;
       this.focusElement("host");
@@ -340,6 +425,31 @@ export default {
           this.focusElement("host");
         }
         isValidationOk = false;
+      }
+
+      if (!this.isAdminConfigured && this.adminPassword) {
+        if (!this.adminEmail) {
+          this.error.admin_email = "common.required";
+          if (isValidationOk) {
+            this.focusElement("admin_email");
+          }
+          isValidationOk = false;
+        }
+
+        // the calrs CLI rejects anything shorter
+        if (this.adminPassword.length < 12) {
+          this.error.admin_password = "settings.password_too_short";
+          if (isValidationOk) {
+            this.focusElement("admin_password");
+          }
+          isValidationOk = false;
+        } else if (this.adminPassword !== this.adminPasswordConfirm) {
+          this.error.adminPasswordConfirm = "settings.password_mismatch";
+          if (isValidationOk) {
+            this.focusElement("adminPasswordConfirm");
+          }
+          isValidationOk = false;
+        }
       }
       return isValidationOk;
     },
@@ -364,8 +474,6 @@ export default {
       }
     },
     async configureModule() {
-      this.error.test_imap = false;
-      this.error.test_smtp = false;
       const isValidationOk = this.validateConfigureModule();
       if (!isValidationOk) {
         return;
@@ -399,6 +507,20 @@ export default {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
             http2https: this.isHttpToHttpsEnabled,
+            mail_from: this.mailFrom,
+            allow_private_hosts: this.allowPrivateHosts
+              ? this.allowPrivateHosts
+                  .split(",")
+                  .map((host) => host.trim())
+                  .filter((host) => host)
+              : [],
+            ...(this.isAdminConfigured || !this.adminPassword
+              ? {}
+              : {
+                  admin_email: this.adminEmail,
+                  admin_name: this.adminName,
+                  admin_password: this.adminPassword,
+                }),
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
@@ -425,6 +547,8 @@ export default {
     },
     configureModuleCompleted() {
       this.loading.configureModule = false;
+      this.adminPassword = "";
+      this.adminPasswordConfirm = "";
 
       // reload configuration
       this.getConfiguration();

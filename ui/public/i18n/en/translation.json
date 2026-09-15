@@ -38,7 +38,23 @@
     "instance_configuration": "Configure calrs",
     "domain_already_used_in_traefik": "Domain already used in traefik",
     "host_pattern": "Must be a valid fully qualified domain name",
-    "host_format": "Must be a valid fully qualified domain name"
+    "host_format": "Must be a valid fully qualified domain name",
+    "mail_from": "Sender address",
+    "mail_from_helper": "Address used as sender of booking messages. Defaults to noreply@<hostname>",
+    "allow_private_hosts": "Private CalDAV hosts",
+    "allow_private_hosts_helper": "Comma-separated host names allowed to bypass the private address check, like an internal Nextcloud",
+    "admin_account": "Administrator account",
+    "admin_account_info": "calrs grants the administrator role to the first registered account. Create it here: registration is then closed.",
+    "admin_email": "Administrator email",
+    "admin_name": "Administrator name",
+    "admin_password": "Administrator password",
+    "admin_password_helper": "At least 12 characters",
+    "admin_password_confirm": "Confirm password",
+    "password_too_short": "Password must be at least 12 characters",
+    "password_mismatch": "Passwords do not match",
+    "mail_from_format": "Must be a valid email address",
+    "admin_email_format": "Must be a valid email address",
+    "admin_password_minlength": "Password must be at least 12 characters"
   },
   "about": {
     "title": "About"
