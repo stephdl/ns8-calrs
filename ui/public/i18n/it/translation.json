@@ -1,57 +1,88 @@
 {
-    "common": {
-        "required": "Obbligatorio",
-        "processing": "Elaborazione in corso...",
-        "work_in_progress": "In lavorazione"
-    },
-    "status": {
-        "node": "Nodo",
-        "services": "Servizio | Servizi",
-        "no_volumes": "Nessun volume",
-        "title": "Stato",
-        "name": "Nome",
-        "size": "Dimensione",
-        "created": "Creato",
-        "no_services": "Nessun servizio",
-        "no_images": "Nessuna immagine",
-        "app_images": "Immagine app|Immagini app",
-        "app_instance": "Istanza app",
-        "app_volumes": "Volume app|Volumi app",
-        "installation_node": "Nodo",
-        "mount": "Percorso di mount"
-    },
-    "settings": {
-        "save": "Salva",
-        "title": "Impostazioni",
-        "configure_instance": "Configura {instance}",
-        "test_field": "Campo di test"
-    },
-    "error": {
-        "error": "Errore",
-        "404": "Risorsa non trovata",
-        "validation_error": "Errore di validazione",
-        "network_error": "Errore di rete",
-        "cannot_retrieve_installed_modules": "Impossibile elencare moduli installati",
-        "cannot_retrieve_module_info": "Impossibile recuperare info modulo",
-        "network_timeout": "Timeout di rete",
-        "generic_error": "Qualcosa è andato storto",
-        "401": "Autenticazione non valida",
-        "403": "Operazione non autorizzata"
-    },
-    "action": {
-        "configure-module": "Configura modulo",
-        "get-configuration": "Visualizza configurazione",
-        "get-status": "Visualizza stato",
-        "get-module-info": "Visualizza info modulo",
-        "get-name": "Visualizza nome",
-        "list-backup-repositories": "Elenca repository di backup",
-        "list-backups": "Elenca backup",
-        "list-installed-modules": "Elenco moduli installati"
-    },
-    "task": {
-        "cannot_create_task": "Impossibile eseguire task {action}"
-    },
-    "about": {
-        "title": "Informazioni"
-    }
+  "common": {
+    "required": "Obbligatorio",
+    "work_in_progress": "In lavorazione",
+    "processing": "Elaborazione in corso..."
+  },
+  "status": {
+    "title": "Stato",
+    "app_instance": "Istanza app",
+    "services": "Servizio | Servizi",
+    "app_images": "Immagine app | Immagini app",
+    "app_volumes": "Volume app | Volumi app",
+    "installation_node": "Nodo di installazione",
+    "node": "Nodo",
+    "name": "Nome",
+    "size": "Dimensione",
+    "created": "Creato",
+    "mount": "Percorso di mount",
+    "no_services": "Nessun servizio",
+    "no_images": "Nessuna immagine",
+    "no_volumes": "Nessun volume",
+    "calrs_webapp": "Applicazione web calrs",
+    "not_configured": "Non configurato",
+    "open_webapp": "Apri calrs",
+    "configure": "Configura"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "configure_instance": "Configura {instance}",
+    "save": "Salva",
+    "calrs_fqdn": "Nome host di calrs (FQDN)",
+    "lets_encrypt": "Richiedi certificato Let's Encrypt",
+    "http_to_https": "Forza HTTPS",
+    "enabled": "Abilitato",
+    "disabled": "Disabilitato",
+    "advanced": "Avanzate",
+    "configuring": "Configurazione",
+    "instance_configuration": "Configura calrs",
+    "domain_already_used_in_traefik": "Dominio già usato in traefik",
+    "host_pattern": "Deve essere un nome di dominio completo valido",
+    "host_format": "Deve essere un nome di dominio completo valido",
+    "mail_from": "Indirizzo mittente",
+    "mail_from_helper": "Indirizzo usato come mittente dei messaggi di prenotazione. Predefinito: noreply@<nome host>",
+    "allow_private_hosts": "Host CalDAV privati",
+    "allow_private_hosts_helper": "Nomi host separati da virgola, autorizzati a ignorare il controllo degli indirizzi privati, come un Nextcloud interno",
+    "admin_account": "Account amministratore",
+    "admin_account_info": "calrs assegna il ruolo di amministratore al primo account registrato. Crealo qui: la registrazione viene poi chiusa.",
+    "admin_email": "Email dell'amministratore",
+    "admin_name": "Nome dell'amministratore",
+    "admin_password": "Password dell'amministratore",
+    "admin_password_helper": "Almeno 12 caratteri",
+    "admin_password_confirm": "Conferma la password",
+    "password_too_short": "La password deve contenere almeno 12 caratteri",
+    "password_mismatch": "Le password non coincidono",
+    "mail_from_format": "Deve essere un indirizzo email valido",
+    "admin_email_format": "Deve essere un indirizzo email valido",
+    "admin_password_minlength": "La password deve contenere almeno 12 caratteri"
+  },
+  "about": {
+    "title": "Informazioni"
+  },
+  "task": {
+    "cannot_create_task": "Impossibile creare l'attività {action}"
+  },
+  "action": {
+    "get-status": "Leggi lo stato",
+    "get-configuration": "Leggi la configurazione",
+    "configure-module": "Configura il modulo",
+    "get-module-info": "Leggi le informazioni del modulo",
+    "get-name": "Leggi il nome",
+    "list-backup-repositories": "Elenca i repository di backup",
+    "list-backups": "Elenca i backup",
+    "list-installed-modules": "Elenca i moduli installati"
+  },
+  "error": {
+    "error": "Errore",
+    "generic_error": "Qualcosa è andato storto",
+    "validation_error": "Errore di validazione",
+    "network_error": "Errore di rete",
+    "network_timeout": "Timeout di rete",
+    "401": "Autenticazione non valida",
+    "403": "Operazione non autorizzata",
+    "404": "Risorsa non trovata",
+    "cannot_retrieve_module_info": "Impossibile recuperare le informazioni del modulo",
+    "cannot_retrieve_installed_modules": "Impossibile recuperare i moduli installati",
+    "cannot_retrieve_configuration": "Impossibile recuperare la configurazione"
+  }
 }
