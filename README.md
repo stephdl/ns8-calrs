@@ -97,6 +97,13 @@ That environment block takes precedence over the calrs database, so the SMTP
 form of the admin dashboard shows the values as read-only. Without a configured
 smarthost, no block is written and the SMTP settings stay editable in calrs.
 
+Host, port and encryption are mapped one to one: NS8 `encrypt_smtp`
+(`none`, `starttls`, `tls`) becomes `CALRS_SMTP_TLS_MODE`. The NS8
+`tls_verify` switch has no calrs counterpart: calrs always verifies the
+server certificate. An internal relay with a self-signed certificate must
+therefore be declared with `encrypt_smtp: none`, or given a trusted
+certificate.
+
 ## Backup and restore
 
 `bin/module-dump-state` takes a consistent snapshot of the live SQLite database
