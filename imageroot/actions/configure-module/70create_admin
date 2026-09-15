@@ -6,8 +6,8 @@
 #
 
 #
-# Create the first administrator, before the service is started. The calrs CLI
-# runs the database migrations on its own, so a cold volume is fine.
+# Create the administrator before the service starts: the calrs CLI migrates
+# a cold volume on its own.
 #
 
 import json

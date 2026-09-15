@@ -6,13 +6,8 @@
 #
 
 #
-# Create the first calrs administrator and close open registration.
-#
-# Usage: create-admin <email> <name>, password read from stdin.
-#
-# `calrs user create` has no --password option: it reads the password with
-# rpassword, hence the pseudo terminal. The command runs in an ephemeral
-# container, the calrs CLI applies pending migrations on its own.
+# Create the first calrs administrator: create-admin <email> <name>, password on stdin.
+# `calrs user create` has no --password flag and reads it with rpassword, hence the PTY.
 #
 
 import os
@@ -26,12 +21,10 @@ email = sys.argv[1]
 name = sys.argv[2]
 password = sys.stdin.readline().rstrip("\n")
 
-# Redirect any output to the journal (stderr)
 sys.stdout = sys.stderr
 
 def cli(*args, tty=False):
-    """Command line of an ephemeral calrs container. A TTY is needed to answer
-    the password prompt of `user create`."""
+    """Command line of an ephemeral calrs container"""
     return [
         "podman", "run", "--rm", "--network=none",
         "--volume", "calrs-data:/var/lib/calrs:z",
@@ -62,7 +55,7 @@ if users.returncode != 0:
     print(agent.SD_ERR + "Cannot list calrs users: " + users.stderr, file=sys.stderr)
     sys.exit(2)
 
-# An account already exists: never touch an existing installation
+# An email in the table means an account exists: leave an existing install alone
 if "@" in users.stdout:
     print("A calrs account already exists: administrator creation skipped", file=sys.stderr)
     sys.exit(0)
@@ -76,7 +69,7 @@ if rc != 0:
     sys.exit(2)
 print(f"Administrator {email} created", file=sys.stderr)
 
-# The upstream rule is "the first user to register becomes admin": close the door
+# Upstream promotes the first registered account to admin: close that door
 registration = subprocess.run(
     cli("config", "auth", "--registration", "false"),
     capture_output=True, text=True,

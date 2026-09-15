@@ -6,14 +6,13 @@
 #
 
 #
-# Restic restores both the volume and the snapshot taken by module-dump-state.
-# Only the snapshot is guaranteed consistent, so it replaces the database file.
-# The copy runs in a container built on the application image, to give the file
-# back to the calrs user.
+# Restic restores the volume and the module-dump-state snapshot. Only the
+# snapshot is consistent, so it replaces calrs.db. The copy runs in the
+# application image to leave the file owned by the calrs user.
 #
 
 set -e -o pipefail
-exec 1>&2 # Redirect any output to the journal (stderr)
+exec 1>&2
 
 if [ ! -f "${AGENT_STATE_DIR}/calrs-backup.db" ]; then
     echo "No database snapshot found in the backup: nothing to restore"

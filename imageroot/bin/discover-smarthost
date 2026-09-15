@@ -7,7 +7,7 @@
 
 #
 # Generate state/discovery.env, the environment block injected in the calrs
-# container. It is rewritten at every container start and on smarthost-changed.
+# container. Rewritten at every container start and on smarthost-changed.
 #
 
 import os
@@ -18,13 +18,11 @@ envfile = "discovery.env"
 tmpfile = envfile + "." + str(os.getpid()) + ".tmp"
 lines = []
 
-# Connect the local Redis replica: the module must start even when the leader
-# node is unreachable.
+# Read the replica: the module must start even when the leader is unreachable
 rdb = agent.redis_connect(use_replica=True)
 smtp = agent.get_smarthost_settings(rdb)
 
-# calrs ignores the CALRS_SMTP_* block unless both HOST and FROM_EMAIL are set,
-# and falls back to its own database with a warning.
+# Without both HOST and FROM_EMAIL calrs ignores the block and warns
 if smtp['enabled'] and smtp['host']:
     from_email = os.environ.get('CALRS_MAIL_FROM', '')
     if not from_email:
@@ -53,5 +51,4 @@ with open(tmpfile, 'w') as efp:
         print(line, file=efp)
 
 os.chmod(tmpfile, 0o600)
-# Commit changes by replacing the existing envfile
 os.replace(tmpfile, envfile)

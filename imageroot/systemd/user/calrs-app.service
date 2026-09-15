@@ -15,7 +15,7 @@ WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/calrs-app.pid %t/calrs-app.ctr-id
-# podman run --env-file fails if the file is missing: create it before the discovery script
+# podman run --env-file fails on a missing file
 ExecStartPre=/bin/touch discovery.env
 ExecStartPre=-runagent discover-smarthost
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/calrs-app.pid \

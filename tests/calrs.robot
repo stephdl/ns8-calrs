@@ -21,7 +21,7 @@ Run calrs cli
     RETURN    ${output}    ${rc}
 
 Fetch page
-    [Documentation]    Fetch a page through Traefik, following the redirect to the sign in page
+    [Documentation]    Fetch a page through Traefik, following redirects
     [Arguments]    ${path}
     ${output}  ${rc} =    Execute Command
     ...    curl -fkL -H "Host: ${TEST_HOST}" https://127.0.0.1${path}
@@ -55,7 +55,7 @@ Check if calrs services are running
     Should Not Contain    ${output}    inactive
 
 Check if calrs answers on its port
-    # -f fails on any HTTP error status, / redirects to the sign in page
+    # -f fails on any HTTP error status
     ${rc} =    Execute Command
     ...    runagent -m ${module_id} bash -c 'curl -fs -o /dev/null http://127.0.0.1:\${TCP_PORT}/auth/login'
     ...    return_rc=True  return_stdout=False

@@ -6,11 +6,9 @@
 #
 set -e
 
-# Redirect any output to the journal (stderr)
 exec 1>&2
 
-# If the control reaches this step, the services can be enabled and started.
-# Every unit is listed: systemd does not cascade to the pod children.
+# Every unit is listed: systemd does not cascade to the pod children
 
 systemctl --user enable calrs.service calrs-app.service
 systemctl --user restart calrs.service calrs-app.service

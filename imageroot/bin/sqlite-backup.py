@@ -6,8 +6,8 @@
 #
 
 #
-# Consistent copy of a live SQLite database, using the online backup API.
-# Run under `podman unshare`: the volume files belong to a sub-uid.
+# Consistent copy of a live SQLite database, with the online backup API.
+# Run it under `podman unshare`: the volume files belong to a sub-uid.
 #
 
 import os

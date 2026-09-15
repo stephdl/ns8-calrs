@@ -7,7 +7,6 @@
 
 set -e
 
-# Redirect any output to the journal (stderr)
 exec 1>&2
 
 if ! podman volume exists calrs-data; then
@@ -16,6 +15,6 @@ fi
 
 mountpoint=$(podman volume inspect calrs-data --format '{{.Mountpoint}}')
 
-# podman unshare enters the user namespace, otherwise the volume files are not readable
+# Without unshare the volume files are not readable: they belong to a sub-uid
 podman unshare python3 "${AGENT_INSTALL_DIR}/bin/sqlite-backup.py" \
     "${mountpoint}/calrs.db" "${AGENT_STATE_DIR}/calrs-backup.db"
