@@ -1,57 +1,88 @@
 {
-    "error": {
-        "403": "Eragiketa baimendu gabea",
-        "cannot_retrieve_installed_modules": "Ezin dira instalatutako moduluak berreskuratu",
-        "401": "Autentifikazio baliogabea",
-        "cannot_retrieve_module_info": "Ezin da moduluaren informazioa berreskuratu",
-        "generic_error": "Zerbait okertu da",
-        "error": "Errorea",
-        "network_timeout": "Sarearen denbora-muga",
-        "404": "Baliabidea ez da aurkitu",
-        "network_error": "Sare-errorea",
-        "validation_error": "Balioztatze-errorea"
-    },
-    "settings": {
-        "test_field": "Proba-eremua",
-        "configure_instance": "{instance} konfiguratu",
-        "save": "Gorde",
-        "title": "Ezarpenak"
-    },
-    "common": {
-        "required": "Beharrezkoa",
-        "work_in_progress": "Lanak martxan",
-        "processing": "Prozesatzen..."
-    },
-    "status": {
-        "created": "Sortuta",
-        "size": "Tamaina",
-        "name": "Izena",
-        "no_images": "Irudirik ez",
-        "app_volumes": "Aplikazioaren bolumena | Aplikazioen bolumenak",
-        "services": "Zerbitzua | Zerbitzuak",
-        "app_images": "Aplikazioaren irudia | Aplikazioen irudiak",
-        "no_services": "Zerbitzurik ez",
-        "app_instance": "Aplikazioaren instantzia",
-        "mount": "Muntatu",
-        "title": "Egoera",
-        "installation_node": "Instalazio-nodoa",
-        "node": "Nodoa",
-        "no_volumes": "Bolumenik ez"
-    },
-    "about": {
-        "title": "Honi buruz"
-    },
-    "action": {
-        "list-backup-repositories": "Babeskopien biltegiak ikusi",
-        "get-module-info": "Moduluaren informazioa berreskuratu",
-        "list-installed-modules": "Instalatutako moduluak ikusi",
-        "list-backups": "Babeskopiak ikusi",
-        "get-status": "Egoera berreskuratu",
-        "configure-module": "Modulua konfiguratu",
-        "get-configuration": "Konfigurazioa berreskuratu",
-        "get-name": "Izena berreskuratu"
-    },
-    "task": {
-        "cannot_create_task": "Ezin da zeregina {action} sortu"
-    }
+  "common": {
+    "required": "Beharrezkoa",
+    "work_in_progress": "Lanak martxan",
+    "processing": "Prozesatzen..."
+  },
+  "status": {
+    "title": "Egoera",
+    "app_instance": "Aplikazioaren instantzia",
+    "services": "Zerbitzua | Zerbitzuak",
+    "app_images": "Aplikazioaren irudia | Aplikazioaren irudiak",
+    "app_volumes": "Aplikazioaren bolumena | Aplikazioaren bolumenak",
+    "installation_node": "Instalazio-nodoa",
+    "node": "Nodoa",
+    "name": "Izena",
+    "size": "Tamaina",
+    "created": "Sortuta",
+    "mount": "Muntatze-puntua",
+    "no_services": "Zerbitzurik ez",
+    "no_images": "Irudirik ez",
+    "no_volumes": "Bolumenik ez",
+    "calrs_webapp": "calrs web aplikazioa",
+    "not_configured": "Konfiguratu gabe",
+    "open_webapp": "Ireki calrs",
+    "configure": "Konfiguratu"
+  },
+  "settings": {
+    "title": "Ezarpenak",
+    "configure_instance": "Konfiguratu {instance}",
+    "save": "Gorde",
+    "calrs_fqdn": "calrs ostalari-izena (FQDN)",
+    "lets_encrypt": "Eskatu Let's Encrypt ziurtagiria",
+    "http_to_https": "Behartu HTTPS",
+    "enabled": "Gaituta",
+    "disabled": "Desgaituta",
+    "advanced": "Aurreratua",
+    "configuring": "Konfiguratzen",
+    "instance_configuration": "Konfiguratu calrs",
+    "domain_already_used_in_traefik": "Domeinua jada erabilita dago traefik-en",
+    "host_pattern": "Domeinu-izen osoa eta baliozkoa izan behar du",
+    "host_format": "Domeinu-izen osoa eta baliozkoa izan behar du",
+    "mail_from": "Bidaltzailearen helbidea",
+    "mail_from_helper": "Erreserba-mezuen bidaltzaile gisa erabiltzen den helbidea. Lehenetsia: noreply@<ostalari-izena>",
+    "allow_private_hosts": "CalDAV ostalari pribatuak",
+    "allow_private_hosts_helper": "Komaz bereizitako ostalari-izenak, helbide pribatuen egiaztapena saihesteko baimenduak, adibidez barneko Nextcloud bat",
+    "admin_account": "Administratzailearen kontua",
+    "admin_account_info": "calrs-ek administratzaile rola ematen dio erregistratutako lehen kontuari. Sortu hemen: erregistroa ondoren ixten da.",
+    "admin_email": "Administratzailearen helbide elektronikoa",
+    "admin_name": "Administratzailearen izena",
+    "admin_password": "Administratzailearen pasahitza",
+    "admin_password_helper": "Gutxienez 12 karaktere",
+    "admin_password_confirm": "Berretsi pasahitza",
+    "password_too_short": "Pasahitzak gutxienez 12 karaktere izan behar ditu",
+    "password_mismatch": "Pasahitzak ez datoz bat",
+    "mail_from_format": "Baliozko helbide elektronikoa izan behar da",
+    "admin_email_format": "Baliozko helbide elektronikoa izan behar da",
+    "admin_password_minlength": "Pasahitzak gutxienez 12 karaktere izan behar ditu"
+  },
+  "about": {
+    "title": "Honi buruz"
+  },
+  "task": {
+    "cannot_create_task": "Ezin da {action} zeregina sortu"
+  },
+  "action": {
+    "get-status": "Irakurri egoera",
+    "get-configuration": "Irakurri konfigurazioa",
+    "configure-module": "Konfiguratu modulua",
+    "get-module-info": "Irakurri moduluaren informazioa",
+    "get-name": "Irakurri izena",
+    "list-backup-repositories": "Zerrendatu babeskopien biltegiak",
+    "list-backups": "Zerrendatu babeskopiak",
+    "list-installed-modules": "Zerrendatu instalatutako moduluak"
+  },
+  "error": {
+    "error": "Errorea",
+    "generic_error": "Zerbait okertu da",
+    "validation_error": "Balioztatze-errorea",
+    "network_error": "Sare-errorea",
+    "network_timeout": "Sarearen denbora-muga",
+    "401": "Autentifikazio baliogabea",
+    "403": "Eragiketa baimendu gabea",
+    "404": "Baliabidea ez da aurkitu",
+    "cannot_retrieve_module_info": "Ezin da moduluaren informazioa berreskuratu",
+    "cannot_retrieve_installed_modules": "Ezin dira instalatutako moduluak berreskuratu",
+    "cannot_retrieve_configuration": "Ezin da konfigurazioa berreskuratu"
+  }
 }

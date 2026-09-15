@@ -1,10 +1,12 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 set -e
 
-systemctl --user try-reload-or-restart kickstart.service
+# SMTP is read at container start, and the pod does not cascade: restart both units
+
+systemctl --user -T try-restart calrs.service calrs-app.service

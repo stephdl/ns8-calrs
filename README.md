@@ -1,163 +1,166 @@
-# ns8-kickstart
+# ns8-calrs
 
-This is a template module for [NethServer 8](https://github.com/NethServer/ns8-core).
-To start a new module from it:
+[calrs](https://cal.rs/) packaged for [NethServer 8](https://github.com/NethServer/ns8-core).
 
-1. Click on [Use this template](https://github.com/NethServer/ns8-kickstart/generate).
-   Name your repo with `ns8-` prefix (e.g. `ns8-mymodule`). 
-   Do not end your module name with a number, like ~~`ns8-baaad2`~~!
+calrs is a self-hosted scheduling platform written in Rust: publish your
+availability, share a booking link, and let people pick a slot. Free/busy is
+computed from your own CalDAV calendars (Nextcloud, SOGo, Fastmail, iCloud...)
+and confirmed bookings are written back to them.
 
-1. Clone the repository, enter the cloned directory and
-   [configure your GIT identity](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup#_your_identity)
-
-1. Rename some references inside the repo:
-   ```
-   modulename=$(basename $(pwd) | sed 's/^ns8-//') &&
-   git mv imageroot/systemd/user/kickstart.service imageroot/systemd/user/${modulename}.service &&
-   git mv imageroot/systemd/user/kickstart-app.service imageroot/systemd/user/${modulename}-app.service && 
-   git mv tests/kickstart.robot tests/${modulename}.robot &&
-   sed -i "s/kickstart/${modulename}/g" $(find .github/ * -type f) &&
-   git commit -a -m "Repository initialization"
-   ```
-
-1. Edit this `README.md` file, by replacing this section with your module
-   description
-
-1. Adjust `.github/workflows` to your needs. `clean-registry.yml` might
-   need the proper list of image names to work correctly. Unused workflows
-   can be disabled from the GitHub Actions interface.
-
-1. Commit and push your local changes
+The module runs a single container in a pod, stores everything in a SQLite
+database inside the `calrs-data` volume, and exposes the application through
+Traefik.
 
 ## Install
 
 Instantiate the module with:
 
-    add-module ghcr.io/nethserver/kickstart:latest 1
+    add-module ghcr.io/stephdl/calrs:latest 1
 
-The output of the command will return the instance name.
-Output example:
+The output of the command returns the instance name, for example:
 
-    {"module_id": "kickstart1", "image_name": "kickstart", "image_url": "ghcr.io/nethserver/kickstart:latest"}
+    {"module_id": "calrs1", "image_name": "calrs", "image_url": "ghcr.io/stephdl/calrs:latest"}
+
+No release is tagged yet, so `latest` does not exist: every branch is published as
+`ghcr.io/stephdl/calrs:<branch name>`, for instance `ghcr.io/stephdl/calrs:calrs-module`.
 
 ## Configure
 
-Let's assume that the mattermost instance is named `kickstart1`.
+Let's assume the instance is named `calrs1`.
 
-Launch `configure-module`, by setting the following parameters:
-- `host`: a fully qualified domain name for the application
+Launch `configure-module` with the following parameters:
+
+- `host`: fully qualified domain name of the application (required)
 - `http2https`: enable or disable HTTP to HTTPS redirection (true/false)
-- `lets_encrypt`: enable or disable Let's Encrypt certificate (true/false)
-
+- `lets_encrypt`: request a Let's Encrypt certificate (true/false)
+- `mail_from`: sender address of booking messages, defaults to `noreply@<host>`
+- `allow_private_hosts`: host names allowed to bypass the calrs private address
+  check, needed to reach a CalDAV server on a private address
+- `admin_email`, `admin_name`, `admin_password`: first administrator account,
+  the password must be at least 12 characters
 
 Example:
 
 ```
-api-cli run configure-module --agent module/kickstart1 --data - <<EOF
+api-cli run configure-module --agent module/calrs1 --data - <<EOF
 {
-  "host": "kickstart.domain.com",
+  "host": "calrs.domain.com",
   "http2https": true,
-  "lets_encrypt": false
+  "lets_encrypt": false,
+  "mail_from": "calrs@domain.com",
+  "allow_private_hosts": ["nextcloud.domain.com"],
+  "admin_email": "admin@domain.com",
+  "admin_name": "Administrator",
+  "admin_password": "Nethesis,1234"
 }
 EOF
 ```
 
 The above command will:
-- start and configure the kickstart instance
-- configure a virtual host for trafik to access the instance
+
+- configure a virtual host in Traefik to reach the instance
+- create the administrator account and close open registration
+- start the calrs pod
+
+### Administrator account
+
+calrs grants the administrator role to the first account that registers. The
+module closes that window: when `admin_email` and `admin_password` are given,
+the account is created before the service starts and registration is disabled.
+The step is skipped when an account already exists, so an existing installation
+is never touched. The password is used once and never stored in the module
+environment.
+
+Further accounts are managed from the calrs admin dashboard, or with the CLI:
+
+    runagent -m calrs1 bash -c 'podman run --rm -it --volume calrs-data:/var/lib/calrs:z ${CALRS_IMAGE} user list'
+
+## Daily use
+
+1. **Connect a calendar** — Dashboard > Sources. calrs reads the CalDAV collections to
+   compute free/busy, and writes confirmed bookings back to the calendar you pick.
+2. **Create an event type** — duration, buffers, booking horizon, which calendars block
+   availability.
+3. **Share the link** — `https://<host>/u/<username>/<slug>`, or `/u/<username>` for the
+   whole list. Guests pick a slot and leave a name and an email: no account, no
+   registration. They get a confirmation mail with a cancellation link.
+
+A CalDAV server on a private address (an internal SOGo or Nextcloud) is refused by the
+calrs SSRF guard until its host name is listed in `allow_private_hosts`. With `ns8-sogo`,
+also set `dav: true` in its own configuration: the flag drives
+`SOGoCalendarDAVAccessEnabled`, and CalDAV is closed while it is false.
 
 ## Get the configuration
-You can retrieve the configuration with
 
 ```
-api-cli run get-configuration --agent module/kickstart1
+api-cli run get-configuration --agent module/calrs1
 ```
 
 ## Uninstall
 
 To uninstall the instance:
 
-    remove-module --no-preserve kickstart1
+    remove-module --no-preserve calrs1
 
-## Smarthost setting discovery
+## Mail
 
-Some configuration settings, like the smarthost setup, are not part of the
-`configure-module` action input: they are discovered by looking at some
-Redis keys.  To ensure the module is always up-to-date with the
-centralized [smarthost
-setup](https://nethserver.github.io/ns8-core/core/smarthost/) every time
-kickstart starts, the command `bin/discover-smarthost` runs and refreshes
-the `state/smarthost.env` file with fresh values from Redis.
+SMTP settings are not part of `configure-module`: they come from the
+centralized [smarthost setup](https://nethserver.github.io/ns8-core/core/smarthost/).
+At every container start `bin/discover-smarthost` writes the `CALRS_SMTP_*`
+block to `state/discovery.env`, and the event handler
+`events/smarthost-changed/10reload_services` restarts the pod when the cluster
+smarthost changes.
 
-Furthermore if smarthost setup is changed when kickstart is already
-running, the event handler `events/smarthost-changed/10reload_services`
-restarts the main module service.
+That environment block takes precedence over the calrs database, so the SMTP
+form of the admin dashboard shows the values as read-only. Without a configured
+smarthost, no block is written and the SMTP settings stay editable in calrs.
 
-See also the `systemd/user/kickstart.service` file.
+Host, port and encryption are mapped one to one: NS8 `encrypt_smtp`
+(`none`, `starttls`, `tls`) becomes `CALRS_SMTP_TLS_MODE`. The NS8
+`tls_verify` switch has no calrs counterpart: calrs always verifies the
+server certificate. An internal relay with a self-signed certificate must
+therefore be declared with `encrypt_smtp: none`, or given a trusted
+certificate.
 
-This setting discovery is just an example to understand how the module is
-expected to work: it can be rewritten or discarded completely.
+## Backup and restore
+
+`bin/module-dump-state` takes a consistent snapshot of the live SQLite database
+with the online backup API, and writes it to `state/calrs-backup.db`. The
+`calrs-data` volume is backed up too: it carries `secret.key`, without which the
+stored CalDAV and SMTP credentials cannot be decrypted.
+
+On restore, `actions/restore-module/40restore_database` puts the snapshot back
+in place of `calrs.db`, dropping the stale WAL files.
 
 ## Debug
 
-some CLI are needed to debug
+The module runs under an agent that sets many environment variables (in
+`/home/calrs1/.config/state`):
 
-- The module runs under an agent that initiate a lot of environment variables (in /home/kickstart1/.config/state), it could be nice to verify them
-on the root terminal
+    runagent -m calrs1 env
 
-    `runagent -m kickstart1 env`
+Become the module user to run scripts with the same environment:
 
-- you can become runagent for testing scripts and initiate all environment variables
-  
-    `runagent -m kickstart1`
+    runagent -m calrs1
 
- the path become : 
-```
-    echo $PATH
-    /home/kickstart1/.config/bin:/usr/local/agent/pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/usr/
-```
-
-- if you want to debug a container or see environment inside
- `runagent -m kickstart1`
- ```
-podman ps
-CONTAINER ID  IMAGE                                      COMMAND               CREATED        STATUS        PORTS                    NAMES
-d292c6ff28e9  localhost/podman-pause:4.6.1-1702418000                          9 minutes ago  Up 9 minutes  127.0.0.1:20015->80/tcp  80b8de25945f-infra
-d8df02bf6f4a  docker.io/library/mariadb:10.11.5          --character-set-s...  9 minutes ago  Up 9 minutes  127.0.0.1:20015->80/tcp  mariadb-app
-9e58e5bd676f  docker.io/library/nginx:stable-alpine3.17  nginx -g daemon o...  9 minutes ago  Up 9 minutes  127.0.0.1:20015->80/tcp  kickstart-app
-```
-
-you can see what environment variable is inside the container
-```
-podman exec  kickstart-app env
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-TERM=xterm
-PKG_RELEASE=1
-MARIADB_DB_HOST=127.0.0.1
-MARIADB_DB_NAME=kickstart
-MARIADB_IMAGE=docker.io/mariadb:10.11.5
-MARIADB_DB_TYPE=mysql
-container=podman
-NGINX_VERSION=1.24.0
-NJS_VERSION=0.7.12
-MARIADB_DB_USER=kickstart
-MARIADB_DB_PASSWORD=kickstart
-MARIADB_DB_PORT=3306
-HOME=/root
-```
-
-you can run a shell inside the container
+Inspect the containers:
 
 ```
-podman exec -ti   kickstart-app sh
-/ # 
+runagent -m calrs1 podman ps
+runagent -m calrs1 podman exec calrs-app env
 ```
+
+The module user cannot read the journal, so follow the logs as root:
+
+```
+journalctl -t calrs-app -f
+```
+
 ## Testing
 
 Test the module using the `test-module.sh` script:
 
-
-    ./test-module.sh <NODE_ADDR> ghcr.io/nethserver/kickstart:latest
+    ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/calrs:latest
 
 The tests are made using [Robot Framework](https://robotframework.org/)
 
@@ -168,4 +171,4 @@ Translated with [Weblate](https://hosted.weblate.org/projects/ns8/).
 To setup the translation process:
 
 - add [GitHub Weblate app](https://docs.weblate.org/en/latest/admin/continuous.html#github-setup) to your repository
-- add your repository to [hosted.weblate.org]((https://hosted.weblate.org) or ask a NethServer developer to add it to ns8 Weblate project
+- add your repository to [hosted.weblate.org](https://hosted.weblate.org) or ask a NethServer developer to add it to ns8 Weblate project

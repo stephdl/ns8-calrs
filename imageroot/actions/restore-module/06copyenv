@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
@@ -16,7 +16,8 @@ original_environment = request['environment']
 for evar in [
         "TRAEFIK_HOST",
         "TRAEFIK_HTTP2HTTPS",
+        "CALRS_MAIL_FROM",
+        "CALRS_ALLOW_PRIVATE_HOSTS",
+        "CALRS_ADMIN_EMAIL",
     ]:
-    agent.set_env(evar, original_environment[evar])
-
-agent.dump_env()
+    agent.set_env(evar, original_environment.get(evar, ""))

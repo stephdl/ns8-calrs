@@ -1,36 +1,54 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Nethesis S.r.l.
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+#
+# Generate state/discovery.env, the environment block injected in the calrs
+# container. Rewritten at every container start and on smarthost-changed.
+#
+
+import os
 import sys
 import agent
-import os
 
-# Connect the local Redis replica. This is necessary to consistently start
-# the service if the leader node is not reachable:
+envfile = "discovery.env"
+tmpfile = envfile + "." + str(os.getpid()) + ".tmp"
+lines = []
+
+# Read the replica: the module must start even when the leader is unreachable
 rdb = agent.redis_connect(use_replica=True)
-smtp_settings = agent.get_smarthost_settings(rdb)
+smtp = agent.get_smarthost_settings(rdb)
 
-envfile = "smarthost.env"
+# Without both HOST and FROM_EMAIL calrs ignores the block and warns
+if smtp['enabled'] and smtp['host']:
+    from_email = os.environ.get('CALRS_MAIL_FROM', '')
+    if not from_email:
+        from_email = 'noreply@' + os.environ.get('TRAEFIK_HOST', 'localhost')
+    lines.append(f"CALRS_SMTP_HOST={smtp['host']}")
+    lines.append(f"CALRS_SMTP_PORT={smtp['port']}")
+    lines.append(f"CALRS_SMTP_TLS_MODE={smtp['encrypt_smtp']}")
+    lines.append(f"CALRS_SMTP_FROM_EMAIL={from_email}")
+    lines.append("CALRS_SMTP_FROM_NAME=calrs")
+    # A password without a username is a fatal error for calrs
+    if smtp['username']:
+        lines.append(f"CALRS_SMTP_USERNAME={smtp['username']}")
+        lines.append(f"CALRS_SMTP_PASSWORD={smtp['password']}")
+    if not smtp['tls_verify']:
+        print(agent.SD_WARNING + "The smarthost disables TLS verification: calrs always verifies it", file=sys.stderr)
+else:
+    print("Smarthost is not configured: SMTP settings are left to the calrs admin page", file=sys.stderr)
 
-# Using .tmp suffix: do not overwrite the target file until the new one is
-# saved to disk:
-with open(envfile + ".tmp", "w") as efp:
-    # HINT for kickstart: adjust variable names as needed
-    print(f"SMTP_ENABLED={'1' if smtp_settings['enabled'] else ''}", file=efp)
-    print(f"SMTP_HOST={smtp_settings['host']}", file=efp)
-    print(f"SMTP_PORT={smtp_settings['port']}", file=efp)
-    print(f"SMTP_USERNAME={smtp_settings['username']}", file=efp)
-    print(f"SMTP_PASSWORD={smtp_settings['password']}", file=efp)
-    print(f"SMTP_ENCRYPTION={smtp_settings['encrypt_smtp']}", file=efp)
-    print(f"SMTP_TLSVERIFY={'1' if smtp_settings['tls_verify'] else ''}", file=efp)
+# An empty value would force an empty allow list and override the database
+private_hosts = os.environ.get('CALRS_ALLOW_PRIVATE_HOSTS', '')
+if private_hosts:
+    lines.append(f"CALRS_ALLOW_PRIVATE_HOSTS={private_hosts}")
 
-# Commit changes by replacing the existing envfile:
-os.replace(envfile + ".tmp", envfile)
+with open(tmpfile, 'w') as efp:
+    for line in lines:
+        print(line, file=efp)
 
-# NOTE: The generated envfile can be included in the service container
-#       with `podman run --env-file` or in Systemd unit with
-#       `Environment=-%S/state/smarthost.env`
+os.chmod(tmpfile, 0o600)
+os.replace(tmpfile, envfile)

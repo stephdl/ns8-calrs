@@ -1,57 +1,88 @@
 {
-    "error": {
-        "403": "Operação não autorizada",
-        "cannot_retrieve_installed_modules": "Não é possível recuperar módulos instalados",
-        "401": "Autenticação inválida",
-        "cannot_retrieve_module_info": "Não é possível recuperar informações do módulo",
-        "generic_error": "Algo deu errado",
-        "error": "Erro",
-        "network_timeout": "Tempo limite da rede",
-        "404": "Recurso não encontrado",
-        "network_error": "Erro de rede",
-        "validation_error": "Erros de validação"
-    },
-    "settings": {
-        "test_field": "Campo de teste",
-        "configure_instance": "Configurar {instância}",
-        "save": "Gravar",
-        "title": "Configurações"
-    },
-    "common": {
-        "required": "Obrigatório",
-        "work_in_progress": "Trabalho em progresso",
-        "processing": "Processando..."
-    },
-    "status": {
-        "created": "Criado",
-        "size": "Tamanho",
-        "name": "Nome",
-        "no_images": "Sem imagens",
-        "app_volumes": "Volume do aplicativo | Volumes dos aplicativos",
-        "services": "Serviço | Serviços",
-        "app_images": "Imagem do aplicativo | Imagens dos aplicativos",
-        "no_services": "Nenhum serviço",
-        "app_instance": "Instância do aplicativo",
-        "mount": "Montar",
-        "title": "Estado",
-        "installation_node": "Nó de instalação",
-        "node": "Node",
-        "no_volumes": "Sem volumes"
-    },
-    "about": {
-        "title": "Sobre"
-    },
-    "action": {
-        "list-backup-repositories": "Listar repositórios de backup",
-        "get-module-info": "Obtenha informações do módulo",
-        "list-installed-modules": "Listar módulos instalados",
-        "list-backups": "Listar backups",
-        "get-status": "Obter status",
-        "configure-module": "Configurar módulo",
-        "get-configuration": "Obter configuração",
-        "get-name": "Obter nome"
-    },
-    "task": {
-        "cannot_create_task": "Não é possível criar a tarefa {action}"
-    }
+  "common": {
+    "required": "Obrigatório",
+    "work_in_progress": "Em curso",
+    "processing": "A processar..."
+  },
+  "status": {
+    "title": "Estado",
+    "app_instance": "Instância da aplicação",
+    "services": "Serviço | Serviços",
+    "app_images": "Imagem da aplicação | Imagens da aplicação",
+    "app_volumes": "Volume da aplicação | Volumes da aplicação",
+    "installation_node": "Nó de instalação",
+    "node": "Nó",
+    "name": "Nome",
+    "size": "Tamanho",
+    "created": "Criado",
+    "mount": "Ponto de montagem",
+    "no_services": "Sem serviços",
+    "no_images": "Sem imagens",
+    "no_volumes": "Sem volumes",
+    "calrs_webapp": "Aplicação web calrs",
+    "not_configured": "Não configurado",
+    "open_webapp": "Abrir calrs",
+    "configure": "Configurar"
+  },
+  "settings": {
+    "title": "Definições",
+    "configure_instance": "Configurar {instance}",
+    "save": "Guardar",
+    "calrs_fqdn": "Nome de anfitrião do calrs (FQDN)",
+    "lets_encrypt": "Pedir certificado Let's Encrypt",
+    "http_to_https": "Forçar HTTPS",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "advanced": "Avançado",
+    "configuring": "A configurar",
+    "instance_configuration": "Configurar calrs",
+    "domain_already_used_in_traefik": "Domínio já utilizado no traefik",
+    "host_pattern": "Deve ser um nome de domínio completo válido",
+    "host_format": "Deve ser um nome de domínio completo válido",
+    "mail_from": "Endereço do remetente",
+    "mail_from_helper": "Endereço utilizado como remetente das mensagens de marcação. Por omissão noreply@<nome de anfitrião>",
+    "allow_private_hosts": "Anfitriões CalDAV privados",
+    "allow_private_hosts_helper": "Nomes de anfitrião separados por vírgulas, autorizados a ignorar a verificação de endereços privados, como um Nextcloud interno",
+    "admin_account": "Conta de administrador",
+    "admin_account_info": "O calrs atribui o papel de administrador à primeira conta registada. Crie-a aqui: o registo fica depois fechado.",
+    "admin_email": "Correio eletrónico do administrador",
+    "admin_name": "Nome do administrador",
+    "admin_password": "Palavra-passe do administrador",
+    "admin_password_helper": "Pelo menos 12 caracteres",
+    "admin_password_confirm": "Confirmar a palavra-passe",
+    "password_too_short": "A palavra-passe deve ter pelo menos 12 caracteres",
+    "password_mismatch": "As palavras-passe não coincidem",
+    "mail_from_format": "Deve ser um endereço de correio eletrónico válido",
+    "admin_email_format": "Deve ser um endereço de correio eletrónico válido",
+    "admin_password_minlength": "A palavra-passe deve ter pelo menos 12 caracteres"
+  },
+  "about": {
+    "title": "Acerca de"
+  },
+  "task": {
+    "cannot_create_task": "Não é possível criar a tarefa {action}"
+  },
+  "action": {
+    "get-status": "Ler o estado",
+    "get-configuration": "Ler a configuração",
+    "configure-module": "Configurar o módulo",
+    "get-module-info": "Ler a informação do módulo",
+    "get-name": "Ler o nome",
+    "list-backup-repositories": "Listar os repositórios de cópias de segurança",
+    "list-backups": "Listar as cópias de segurança",
+    "list-installed-modules": "Listar os módulos instalados"
+  },
+  "error": {
+    "error": "Erro",
+    "generic_error": "Algo correu mal",
+    "validation_error": "Erro de validação",
+    "network_error": "Erro de rede",
+    "network_timeout": "Tempo de rede esgotado",
+    "401": "Autenticação inválida",
+    "403": "Operação não autorizada",
+    "404": "Recurso não encontrado",
+    "cannot_retrieve_module_info": "Não é possível obter a informação do módulo",
+    "cannot_retrieve_installed_modules": "Não é possível obter os módulos instalados",
+    "cannot_retrieve_configuration": "Não é possível obter a configuração"
+  }
 }

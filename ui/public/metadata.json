@@ -1,19 +1,19 @@
 {
-  "name": "kickstart",
+  "name": "calrs",
   "description": {
-    "en": "My kickstart module"
+    "en": "Self-hosted scheduling: publish your availability, let people book a slot in your CalDAV calendar"
   },
-  "categories": [],
+  "categories": ["collaboration"],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "Stephane de Labrusse",
+      "email": "stephane.delabrusse@nethesis.it"
     }
   ],
   "docs": {
-    "documentation_url": "https://docs.kickstart.com/",
-    "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-kickstart"
+    "documentation_url": "https://cal.rs/",
+    "bug_url": "https://github.com/stephdl/ns8-calrs/issues",
+    "code_url": "https://github.com/stephdl/ns8-calrs"
   },
-  "source": "ghcr.io/nethserver/kickstart"
+  "source": "ghcr.io/stephdl/calrs"
 }

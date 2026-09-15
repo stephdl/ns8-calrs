@@ -1,13 +1,20 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Configure kickstart",
-    "$id": "http://nethserver.org/json-schema/task/input/kickstart/configure-module",
-    "description": "Configure kickstart",
+    "title": "Configure calrs",
+    "$id": "http://nethserver.org/json-schema/task/input/calrs/configure-module",
+    "description": "Configure calrs",
     "examples": [
         {
-            "host": "kickstart.domain.org",
+            "host": "calrs.domain.org",
             "http2https": true,
-            "lets_encrypt": true
+            "lets_encrypt": true,
+            "mail_from": "calrs@domain.org",
+            "allow_private_hosts": [
+                "nextcloud.domain.org"
+            ],
+            "admin_email": "admin@domain.org",
+            "admin_name": "Administrator",
+            "admin_password": "Nethesis,1234"
         }
     ],
     "type": "object",
@@ -17,7 +24,7 @@
     "properties": {
         "host": {
             "type": "string",
-            "description": "Host name for the application, like 'kickstart.domain.org'",
+            "description": "Host name for the application, like 'calrs.domain.org'",
             "format": "hostname",
             "pattern": "\\."
         },
@@ -30,6 +37,51 @@
             "type": "boolean",
             "title": "HTTP to HTTPS redirection",
             "description": "Redirect all the HTTP requests to HTTPS"
+        },
+        "mail_from": {
+            "type": "string",
+            "title": "Sender address",
+            "description": "Address used as sender of booking messages. Defaults to noreply@<host>",
+            "anyOf": [
+                {
+                    "format": "idn-email"
+                },
+                {
+                    "const": ""
+                }
+            ]
+        },
+        "allow_private_hosts": {
+            "type": "array",
+            "title": "Private CalDAV hosts",
+            "description": "Host names or addresses allowed to bypass the private address check, like an internal Nextcloud",
+            "items": {
+                "type": "string"
+            }
+        },
+        "admin_email": {
+            "type": "string",
+            "title": "Administrator email",
+            "description": "Email address of the first administrator. Ignored if an account already exists",
+            "anyOf": [
+                {
+                    "format": "idn-email"
+                },
+                {
+                    "const": ""
+                }
+            ]
+        },
+        "admin_name": {
+            "type": "string",
+            "title": "Administrator name",
+            "description": "Display name of the first administrator"
+        },
+        "admin_password": {
+            "type": "string",
+            "title": "Administrator password",
+            "description": "Password of the first administrator, at least 12 characters",
+            "minLength": 12
         }
     }
 }
