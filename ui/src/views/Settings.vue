@@ -466,7 +466,8 @@ export default {
     },
     configureModuleValidationFailed(validationErrors) {
       this.loading.configureModule = false;
-      let focusAlreadySet = false;
+      let focusParam = "";
+      let openAdvanced = false;
       for (const validationError of validationErrors) {
         const param = validationError.parameter;
         if (validationError.details) {
@@ -477,14 +478,24 @@ export default {
         } else {
           // set i18n error message
           this.error[param] = this.$t("settings." + validationError.error);
-          if (ADVANCED_FIELDS.includes(param)) {
+          openAdvanced = openAdvanced || ADVANCED_FIELDS.includes(param);
+          focusParam = focusParam || param;
+        }
+      }
+
+      // cv-accordion-item copies the open prop into its own state and a manual
+      // collapse leaves the two apart, so re-asserting true changes nothing:
+      // drive the prop through false to make the watcher fire
+      if (openAdvanced) {
+        this.isAdvancedOpen = false;
+      }
+      if (focusParam) {
+        this.$nextTick(() => {
+          if (openAdvanced) {
             this.isAdvancedOpen = true;
           }
-          if (!focusAlreadySet) {
-            this.$nextTick(() => this.focusElement(param));
-            focusAlreadySet = true;
-          }
-        }
+          this.$nextTick(() => this.focusElement(focusParam));
+        });
       }
     },
     async configureModule() {
