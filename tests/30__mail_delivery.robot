@@ -43,10 +43,10 @@ Check if the application container reaches the relay
     ${timestamp} =    Get Current Date    result_format=%Y-%m-%d %H:%M:%S
     Set Suite Variable    ${sent_since}    ${timestamp}
     ${output}  ${rc} =    Execute Command
-    ...    runagent -m ${module_id} podman exec calrs-app calrs config smtp-test ${ADMIN_EMAIL}
+    ...    runagent -m ${module_id} podman exec calrs-app calrs config smtp-test ${PROBE_EMAIL}
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
-    Wait Until Keyword Succeeds    10x    2s    Message should reach the mailbox of    ${ADMIN_EMAIL}
+    Wait Until Keyword Succeeds    10x    2s    Message should reach the mailbox of    ${PROBE_EMAIL}
 
 *** Keywords ***
 Message should reach the mailbox of

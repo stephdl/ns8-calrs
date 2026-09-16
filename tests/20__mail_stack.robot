@@ -13,12 +13,15 @@ Check if the account provider is installed
     Run task    module/${ldap_id}/configure-module
     ...    {"domain":"${USER_DOMAIN}","admuser":"admin","admpass":"Nethesis,1234","provision":"new-domain"}
 
-Check if the two mailbox owners are created
-    # u1 hosts the bookings and is the calrs administrator, u3 books a slot
+Check if the mailbox owners are created
+    # u1 hosts the bookings and is the calrs administrator, u3 books a slot,
+    # u2 receives nothing but the SMTP probe
     Run task    module/${ldap_id}/add-user
     ...    {"user":"u1","display_name":"Booking Host","password":"Nethesis,1234"}
     Run task    module/${ldap_id}/add-user
     ...    {"user":"u3","display_name":"Booking Guest","password":"Nethesis,1234"}
+    Run task    module/${ldap_id}/add-user
+    ...    {"user":"u2","display_name":"SMTP Probe","password":"Nethesis,1234"}
 
 Check if the mail server is installed
     ${output}  ${rc} =    Execute Command    add-module ghcr.io/nethserver/mail:main 1

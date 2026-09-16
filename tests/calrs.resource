@@ -13,6 +13,10 @@ ${MAIL_HOSTNAME}    mail.${MAIL_DOMAIN}
 # booking mail reach them
 ${ADMIN_EMAIL}    u1@${MAIL_DOMAIN}
 ${GUEST_EMAIL}    u3@${MAIL_DOMAIN}
+# Only the smtp-test case writes here, so its journal record cannot be confused
+# with a booking message: journalctl -S resolves to the second, and the two are
+# sent within one
+${PROBE_EMAIL}    u2@${MAIL_DOMAIN}
 ${ADMIN_PASSWORD}    Nethesis,1234
 # calrs derives the username from the email local part
 ${ADMIN_USERNAME}    u1
