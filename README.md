@@ -154,10 +154,23 @@ smarthost, no block is written and the SMTP settings stay editable in calrs.
 
 Host, port and encryption are mapped one to one: NS8 `encrypt_smtp`
 (`none`, `starttls`, `tls`) becomes `CALRS_SMTP_TLS_MODE`. The NS8
-`tls_verify` switch has no calrs counterpart: calrs always verifies the
-server certificate. An internal relay with a self-signed certificate must
-therefore be declared with `encrypt_smtp: none`, or given a trusted
-certificate.
+`tls_verify` switch has no calrs counterpart: calrs always verifies the server
+certificate, and it verifies against the root bundle compiled into the binary,
+not the system trust store. Adding your own authority to the node, or to the
+container, changes nothing.
+
+So a relay whose certificate is self-signed or issued by a private authority
+cannot be reached over `starttls` or `tls`. Two ways out:
+
+- declare the smarthost with `encrypt_smtp: none` when the relay is the local
+  MTA, reached over the loopback or a trusted private link. That is the usual
+  NS8 layout: calrs hands the message to the node's mail module, which carries
+  it outward over a verified connection of its own.
+- give the relay a certificate that chains to a public authority, Let's Encrypt
+  for instance, on the very name calrs connects to.
+
+`bin/discover-smarthost` warns in the journal when the smarthost combines an
+encrypted mode with `tls_verify: false`, the one setting calrs cannot honour.
 
 ## Backup and restore
 

@@ -36,8 +36,17 @@ if smtp['enabled'] and smtp['host']:
     if smtp['username']:
         lines.append(f"CALRS_SMTP_USERNAME={smtp['username']}")
         lines.append(f"CALRS_SMTP_PASSWORD={smtp['password']}")
-    if not smtp['tls_verify']:
-        print(agent.SD_WARNING + "The smarthost disables TLS verification: calrs always verifies it", file=sys.stderr)
+    # calrs has no counterpart for tls_verify: lettre is built against the
+    # Mozilla root bundle, so a private CA cannot be trusted at all. Only the
+    # encrypted modes are affected, hence the test on encrypt_smtp
+    if smtp['encrypt_smtp'] in ('starttls', 'tls') and not smtp['tls_verify']:
+        print(
+            agent.SD_WARNING
+            + "The smarthost disables TLS verification, which calrs cannot do:"
+            + " mail will fail unless the relay presents a publicly trusted"
+            + " certificate, or the smarthost is declared with encrypt_smtp none",
+            file=sys.stderr,
+        )
 else:
     print("Smarthost is not configured: SMTP settings are left to the calrs admin page", file=sys.stderr)
 
