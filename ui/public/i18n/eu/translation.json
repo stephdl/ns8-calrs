@@ -44,7 +44,7 @@
     "allow_private_hosts_helper": "Komaz bereizitako ostalari-izenak edo IP helbideak, adibidez nextcloud.lan, 192.168.1.10",
     "allow_private_hosts_info": "calrs-ek CalDAV URL bat baztertzen du haren ostalari-izena IP helbide pribatu edo erreserbatu batera ebazten bada, server-side request forgery-aren aurkako babesa. Gehitu ostalari bat hemen egutegi-zerbitzaria zure sare lokalean badago soilik, adibidez barneko Nextcloud bat. Parekatzea zehatza da eta ez ditu maiuskulak bereizten: komodinik ez, azpidomeinurik ez.",
     "admin_account": "Administratzailearen kontua",
-    "admin_account_info": "calrs-ek administratzaile rola ematen dio erregistratutako lehen kontuari. Sortu hemen: erregistroa ondoren ixten da.",
+    "admin_account_info": "calrs-ek administratzaile rola ematen dio erregistratzen den lehen kontuari. Moduluak kontu hori orain sortzen du eta izen-emateak ixten ditu, beraz beheko eremu guztiak derrigorrezkoak dira. Atal hau desagertu egiten da kontua sortu ondoren.",
     "admin_email": "Administratzailearen helbide elektronikoa",
     "admin_name": "Administratzailearen izena",
     "admin_password": "Administratzailearen pasahitza",

@@ -417,7 +417,9 @@ export default {
         isValidationOk = false;
       }
 
-      if (!this.isAdminConfigured && this.adminPassword) {
+      // Skipping the account would publish the instance with open registration,
+      // and calrs promotes the first account that registers to administrator
+      if (!this.isAdminConfigured) {
         if (!this.adminEmail) {
           this.error.admin_email = "common.required";
           if (isValidationOk) {
@@ -426,8 +428,22 @@ export default {
           isValidationOk = false;
         }
 
-        // the calrs CLI rejects anything shorter
-        if (this.adminPassword.length < 12) {
+        if (!this.adminName) {
+          this.error.admin_name = "common.required";
+          if (isValidationOk) {
+            this.focusElement("admin_name");
+          }
+          isValidationOk = false;
+        }
+
+        if (!this.adminPassword) {
+          this.error.admin_password = "common.required";
+          if (isValidationOk) {
+            this.focusElement("admin_password");
+          }
+          isValidationOk = false;
+        } else if (this.adminPassword.length < 12) {
+          // the calrs CLI rejects anything shorter
           this.error.admin_password = "settings.password_too_short";
           if (isValidationOk) {
             this.focusElement("admin_password");
@@ -503,7 +519,7 @@ export default {
                   .map((host) => host.trim())
                   .filter((host) => host)
               : [],
-            ...(this.isAdminConfigured || !this.adminPassword
+            ...(this.isAdminConfigured
               ? {}
               : {
                   admin_email: this.adminEmail,
