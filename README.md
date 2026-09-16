@@ -81,29 +81,30 @@ subdomain matching. Keep the list as short as possible.
 
 ### Administrator account
 
-calrs grants the administrator role to the first account that registers. When
-`admin_email` and `admin_password` are given, the module creates that account
-before the service starts and closes open registration in the same run, so the
-role is never up for grabs. That single write is the whole of the module's
-involvement: the registration setting then belongs to the calrs admin panel,
-and no later `configure-module` touches it.
-
-The step is skipped when an account already exists, so an existing installation
-is never touched: `CALRS_ADMIN_EMAIL` is then left alone and the settings page
-keeps offering the form. The password is used once and never stored in the
-module environment.
-
-The action refuses to publish an instance nobody owns. The two fields go
+calrs grants the administrator role to the first account that registers, so an
+instance published with an empty database belongs to whoever gets there first.
+`configure-module` refuses to do that: `admin_email` and `admin_password` go
 together — the input schema pairs them, so passing one alone fails validation —
-and when neither is given the action checks the database: an empty calrs holds
-no administrator, so `configure-module` stops there rather than starting an
-instance whose admin role goes to the first visitor who registers.
+and while calrs holds no account, both are required. `admin_name` stays free:
+left out, the account takes the email as its display name.
 
-A clone and a restore pass that check without credentials: the core rsyncs the
-volumes before the module reconfigures itself, and Restic restores them, so the
-accounts are already in place. The one case that stops is a restore of a backup
-taken from an instance that never had an account — configure that instance with
-`admin_email` and `admin_password` and the restore goes through.
+When the credentials are given, the module creates the account before the
+service starts and closes open registration in the same run. That single write
+is the whole of the module's involvement: the registration setting then belongs
+to the calrs admin panel, and no later `configure-module` touches it.
+
+The creation is skipped when an account already exists, and `CALRS_ADMIN_EMAIL`
+is recorded only after a real creation. An instance where somebody registered
+before the first configure therefore keeps offering the form on the settings
+page instead of reporting itself as configured. The password is used once and
+never stored in the module environment.
+
+A clone and a restore reconfigure themselves with no credentials and pass the
+check, because their data lands first: the core rsyncs the volumes, and Restic
+plus `40restore_database` put the database back. The accounts are already
+there. The one case that stops is restoring a backup taken from an instance
+that never had an account — configure it with `admin_email` and
+`admin_password` and the restore goes through.
 
 Further accounts are managed from the calrs admin dashboard, or with the CLI:
 
