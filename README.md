@@ -219,7 +219,15 @@ run in filename order:
   of `configure-module`, the backup dump and the booking page.
 - `15__ui.robot` logs into cluster-admin and captures the Status, Settings and
   About pages of the module under `tests/outputs/browser/screenshot/`. Those
-  files are what the software center entry ships as screenshots.
+  files are what the software center entry ships as screenshots. The case is
+  tagged `ui` and is skipped unless `RUN_UI_TESTS=true`, since it needs the
+  Playwright image:
+
+      RUN_UI_TESTS=true ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/calrs:latest
+
+  In CI it runs on a renovate branch that touched `ui/` or `build-images.sh`, or
+  on demand through the *Test module on QEMU* workflow, and the screenshots are
+  then published as a comment on the pull request.
 - `20__mail_stack.robot` installs an OpenLDAP account provider and `ns8-mail`,
   turns the antispam and antivirus filters off, and points the cluster smarthost
   at the mail server with `encrypt_smtp: none`.
