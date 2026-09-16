@@ -12,7 +12,7 @@
   ],
   "docs": {
     "documentation_url": "https://cal.rs/",
-    "bug_url": "https://github.com/stephdl/ns8-calrs/issues",
+    "bug_url": "https://github.com/stephdl/dev/issues",
     "code_url": "https://github.com/stephdl/ns8-calrs"
   },
   "source": "ghcr.io/stephdl/calrs"
