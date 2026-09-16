@@ -212,7 +212,20 @@ Test the module using the `test-module.sh` script:
 
     ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/calrs:latest
 
-The tests are made using [Robot Framework](https://robotframework.org/)
+The tests are made using [Robot Framework](https://robotframework.org/), and
+run in filename order:
+
+- `10__calrs.robot` installs and configures the module, and covers the refusals
+  of `configure-module`, the backup dump and the booking page.
+- `20__mail_stack.robot` installs an OpenLDAP account provider and `ns8-mail`,
+  turns the antispam and antivirus filters off, and points the cluster smarthost
+  at the mail server with `encrypt_smtp: none`.
+- `30__mail_delivery.robot` books a slot and follows the guest confirmation and
+  the host notification until Postfix hands them to Dovecot.
+- `90__uninstall.robot` removes calrs, the mail server and the user domain.
+
+The node is left with an account provider and a mail server installed until the
+last suite runs, so run the tests on a throwaway node.
 
 ## UI translation
 
