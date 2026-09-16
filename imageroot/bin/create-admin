@@ -70,3 +70,14 @@ if rc != 0:
     print(agent.SD_ERR + "Administrator creation failed: " + output, file=sys.stderr)
     sys.exit(2)
 print(f"Administrator {email} created", file=sys.stderr)
+
+# Upstream promotes the first registered account to admin: close that door once,
+# here, as part of the bootstrap. The calrs admin panel owns the setting after.
+registration = subprocess.run(
+    cli("config", "auth", "--registration", "false"),
+    capture_output=True, text=True,
+)
+if registration.returncode != 0:
+    print(agent.SD_ERR + "Cannot disable registration: " + registration.stderr, file=sys.stderr)
+    sys.exit(2)
+print("Open registration disabled", file=sys.stderr)
