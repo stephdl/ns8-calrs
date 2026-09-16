@@ -39,18 +39,21 @@ Check if calrs is installed correctly
 
 Check if a configuration without credentials is refused
     # calrs gives the admin role to the first account that registers: the action
-    # refuses to publish an instance whose database holds nobody
-    ${errors} =    Run task    module/${module_id}/configure-module
-    ...    {"host":"${TEST_HOST}","lets_encrypt":false}
-    ...    decode_json=${FALSE}    rc_expected=2
-    Should Contain    ${errors}    calrs holds no account
+    # refuses to publish an instance whose database holds nobody. The step
+    # message reaches stderr, which Run task does not return
+    ${stderr}  ${rc} =    Execute Command
+    ...    api-cli run module/${module_id}/configure-module --data '{"host":"${TEST_HOST}","lets_encrypt":false}'
+    ...    return_stdout=False    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    ${rc}  2
+    Should Contain    ${stderr}    calrs holds no account
 
 Check if half the administrator credentials are refused
-    # The agent exits 10 on a JSON Schema input validation failure
+    # The agent exits 10 on a JSON Schema input validation failure. A missing
+    # dependency is reported on the whole object, not on the lonely field
     ${errors} =    Run task    module/${module_id}/configure-module
     ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}"}
     ...    decode_json=${FALSE}    rc_expected=10
-    Should Contain    ${errors}    admin_password
+    Should Contain    ${errors}    missing_dependency
 
 Check if calrs can be configured
     Run task    module/${module_id}/configure-module
