@@ -93,11 +93,10 @@ service starts and closes open registration in the same run. That single write
 is the whole of the module's involvement: the registration setting then belongs
 to the calrs admin panel, and no later `configure-module` touches it.
 
-The creation is skipped when an account already exists, and `CALRS_ADMIN_EMAIL`
-is recorded only after a real creation. An instance where somebody registered
-before the first configure therefore keeps offering the form on the settings
-page instead of reporting itself as configured. The password is used once and
-never stored in the module environment.
+The creation is skipped when an account already exists — a clone, a restore, a
+second configure — and `CALRS_ADMIN_EMAIL` is recorded only after a real
+creation, so the variable never claims an account the module did not create.
+The password is used once and never stored in the module environment.
 
 A clone and a restore reconfigure themselves with no credentials and pass the
 check, because their data lands first: the core rsyncs the volumes, and Restic
