@@ -26,6 +26,8 @@ if not email or not password:
     # instance started with an empty base belongs to whoever gets there first.
     # The input schema pairs the two fields, so only the empty case reaches here.
     check = subprocess.run(["create-admin", "--check"])
+    # 0 and 3 answer the question, anything else means the helper itself broke
+    agent.assert_exp(check.returncode in (0, 3), "The create-admin helper failed!")
     agent.assert_exp(
         check.returncode == 3,
         "calrs holds no account: pass admin_email and admin_password to create the administrator",
