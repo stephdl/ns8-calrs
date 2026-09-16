@@ -68,6 +68,12 @@ Check if the sign in page is served through Traefik
     # The registration link is rendered only while open registration is enabled
     Should Not Contain    ${output}    /auth/register
 
+Check if open registration is disabled
+    # calrs promotes the first account that registers to administrator
+    ${output}  ${rc} =    Run calrs cli    config show
+    Should Be Equal As Integers    ${rc}  0
+    Should Match Regexp    ${output}    Registration:\\s+disabled
+
 Check if the administrator account exists
     ${output}  ${rc} =    Run calrs cli    user list
     Should Be Equal As Integers    ${rc}  0

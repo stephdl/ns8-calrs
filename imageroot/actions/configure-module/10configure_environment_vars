@@ -14,6 +14,3 @@ data = json.load(sys.stdin)
 agent.set_env("TRAEFIK_HOST", data["host"])
 agent.set_env("CALRS_MAIL_FROM", data.get("mail_from", ""))
 agent.set_env("CALRS_ALLOW_PRIVATE_HOSTS", ",".join(data.get("allow_private_hosts", [])))
-
-# The administrator password is never stored: set_env writes to Redis in clear text
-agent.set_env("CALRS_ADMIN_EMAIL", data.get("admin_email", ""))

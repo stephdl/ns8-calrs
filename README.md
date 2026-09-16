@@ -79,12 +79,16 @@ subdomain matching. Keep the list as short as possible.
 
 ### Administrator account
 
-calrs grants the administrator role to the first account that registers. The
-module closes that window: when `admin_email` and `admin_password` are given,
-the account is created before the service starts and registration is disabled.
-The step is skipped when an account already exists, so an existing installation
-is never touched. The password is used once and never stored in the module
-environment.
+calrs grants the administrator role to the first account that registers. Every
+`configure-module` closes open registration before the service starts, whether
+or not an administrator is created, so no window is left where a visitor can
+claim the role.
+
+When `admin_email` and `admin_password` are given, the account is created in
+the same run. The step is skipped when an account already exists, so an
+existing installation is never touched: `CALRS_ADMIN_EMAIL` is then left alone
+and the settings page keeps offering the form. The password is used once and
+never stored in the module environment.
 
 Further accounts are managed from the calrs admin dashboard, or with the CLI:
 

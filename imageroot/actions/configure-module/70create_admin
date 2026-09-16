@@ -32,4 +32,13 @@ proc = subprocess.run(
     input=password + "\n",
     text=True,
 )
+
+# 3 means an account was already there: nothing was created, record nothing
+if proc.returncode == 3:
+    sys.exit(0)
+
 agent.assert_exp(proc.returncode == 0, "The create-admin helper failed!")
+
+# Written here and not with the other variables: the UI reads it to tell that
+# the account exists, so an attempt that created nothing must not set it
+agent.set_env("CALRS_ADMIN_EMAIL", email)

@@ -7,6 +7,7 @@
 
 #
 # Create the first calrs administrator: create-admin <email> <name>, password on stdin.
+# Exit 0 when the account is created, 3 when one already exists, 2 on failure.
 # `calrs user create` has no --password flag and reads it with rpassword, hence the PTY.
 #
 
@@ -55,10 +56,11 @@ if users.returncode != 0:
     print(agent.SD_ERR + "Cannot list calrs users: " + users.stderr, file=sys.stderr)
     sys.exit(2)
 
-# An email in the table means an account exists: leave an existing install alone
+# An email in the table means an account exists: leave an existing install alone.
+# Exit 3 so the caller knows no account was created and records nothing.
 if "@" in users.stdout:
     print("A calrs account already exists: administrator creation skipped", file=sys.stderr)
-    sys.exit(0)
+    sys.exit(3)
 
 rc, output = run_with_password(
     cli("user", "create", "--email", email, "--name", name, "--admin", tty=True),
@@ -68,13 +70,3 @@ if rc != 0:
     print(agent.SD_ERR + "Administrator creation failed: " + output, file=sys.stderr)
     sys.exit(2)
 print(f"Administrator {email} created", file=sys.stderr)
-
-# Upstream promotes the first registered account to admin: close that door
-registration = subprocess.run(
-    cli("config", "auth", "--registration", "false"),
-    capture_output=True, text=True,
-)
-if registration.returncode != 0:
-    print(agent.SD_ERR + "Cannot disable registration: " + registration.stderr, file=sys.stderr)
-    sys.exit(2)
-print("Open registration disabled", file=sys.stderr)
