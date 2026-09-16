@@ -21,7 +21,7 @@ container=$(buildah from scratch)
 # Reuse existing nodebuilder-calrs container, to speed up builds
 if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-calrs; then
     echo "Pulling NodeJS runtime..."
-    buildah from --name nodebuilder-calrs -v "${PWD}:/usr/src:Z" docker.io/library/node:lts
+    buildah from --name nodebuilder-calrs -v "${PWD}:/usr/src:Z" docker.io/library/node:24.21.0
 fi
 
 echo "Build static UI files with node..."
