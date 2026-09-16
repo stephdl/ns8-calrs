@@ -34,7 +34,8 @@ Launch `configure-module` with the following parameters:
 - `lets_encrypt`: request a Let's Encrypt certificate (true/false)
 - `mail_from`: sender address of booking messages, defaults to `noreply@<host>`
 - `allow_private_hosts`: host names allowed to bypass the calrs private address
-  check, needed to reach a CalDAV server on a private address
+  check, needed to reach a CalDAV server on a private address (see
+  [Private CalDAV hosts](#private-caldav-hosts))
 - `admin_email`, `admin_name`, `admin_password`: first administrator account,
   the password must be at least 12 characters
 
@@ -59,6 +60,22 @@ The above command will:
 - configure a virtual host in Traefik to reach the instance
 - create the administrator account and close open registration
 - start the calrs pod
+
+### Private CalDAV hosts
+
+CalDAV source URLs are typed by the users, so calrs refuses any URL whose host
+name resolves to a private or reserved IP address: loopback, RFC1918,
+link-local, ULA. The check runs before the first HTTP request and guards
+against server-side request forgery.
+
+A calendar server on the LAN is refused by that same check. List its host name
+in `allow_private_hosts` to lift the check for that host only; every other host
+is still validated. Matching is exact and case-insensitive: no wildcards, no
+subdomain matching. Keep the list as short as possible.
+
+```
+"allow_private_hosts": ["nextcloud.lan", "192.168.1.10"]
+```
 
 ### Administrator account
 

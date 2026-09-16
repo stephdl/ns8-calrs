@@ -144,6 +144,13 @@
               <cv-accordion-item :open="toggleAccordion[0]">
                 <template slot="title">{{ $t("settings.advanced") }}</template>
                 <template slot="content">
+                  <NsInlineNotification
+                    kind="info"
+                    :title="$t('settings.allow_private_hosts')"
+                    :description="$t('settings.allow_private_hosts_info')"
+                    :showCloseButton="false"
+                    class="mg-bottom"
+                  />
                   <NsTextInput
                     :label="$t('settings.allow_private_hosts')"
                     v-model.trim="allowPrivateHosts"
