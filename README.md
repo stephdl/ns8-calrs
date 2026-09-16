@@ -60,7 +60,7 @@ EOF
 The above command will:
 
 - configure a virtual host in Traefik to reach the instance
-- create the administrator account and close open registration
+- close open registration and create the administrator account
 - start the calrs pod
 
 ### Private CalDAV hosts
@@ -85,13 +85,16 @@ calrs grants the administrator role to the first account that registers, so an
 instance published with an empty database belongs to whoever gets there first.
 `configure-module` refuses to do that: `admin_email` and `admin_password` go
 together — the input schema pairs them, so passing one alone fails validation —
-and while calrs holds no account, both are required. `admin_name` stays free:
-left out, the account takes the email as its display name.
+and while calrs holds no account, both are required. `admin_name` stays free
+for the API: left out, the account takes the email as its display name. The
+settings page asks for it all the same.
 
-When the credentials are given, the module creates the account before the
-service starts and closes open registration in the same run. That single write
-is the whole of the module's involvement: the registration setting then belongs
-to the calrs admin panel, and no later `configure-module` touches it.
+When the credentials are given, the module closes open registration and creates
+the account, in that order and before the service starts: a run that fails
+halfway leaves nothing to claim, and the next one closes the door again. That
+single write is the whole of the module's involvement — once an account exists
+the module never touches the setting again, and it belongs to the calrs admin
+panel.
 
 The creation is skipped when an account already exists — a clone, a restore, a
 second configure — and `CALRS_ADMIN_EMAIL` is recorded only after a real
