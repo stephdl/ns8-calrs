@@ -23,7 +23,8 @@ ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/calrs.pid \
     --pod-id-file %t/calrs.pod-id \
     --name calrs \
     --publish 127.0.0.1:${TCP_PORT}:3000 \
-    --replace
+    --replace \
+    --network=slirp4netns:allow_host_loopback=true
 ExecStart=/usr/bin/podman pod start --pod-id-file %t/calrs.pod-id
 ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/calrs.pod-id -t 10
 ExecStopPost=/usr/bin/podman pod rm --ignore -f --pod-id-file %t/calrs.pod-id
