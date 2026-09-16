@@ -8,6 +8,10 @@
 #
 # Create the first calrs administrator: create-admin <email> <name>, password on stdin.
 # Exit 0 when the account is created, 3 when one already exists, 2 on failure.
+#
+# create-admin --check only reports, with the same exit codes: 3 when calrs
+# already holds an account, 0 when the base is empty.
+#
 # `calrs user create` has no --password flag and reads it with rpassword, hence the PTY.
 #
 
@@ -18,9 +22,14 @@ import sys
 
 import agent
 
-email = sys.argv[1]
-name = sys.argv[2]
-password = sys.stdin.readline().rstrip("\n")
+check_only = sys.argv[1:2] == ["--check"]
+
+if check_only:
+    email = name = password = ""
+else:
+    email = sys.argv[1]
+    name = sys.argv[2]
+    password = sys.stdin.readline().rstrip("\n")
 
 sys.stdout = sys.stderr
 
@@ -59,8 +68,12 @@ if users.returncode != 0:
 # An email in the table means an account exists: leave an existing install alone.
 # Exit 3 so the caller knows no account was created and records nothing.
 if "@" in users.stdout:
-    print("A calrs account already exists: administrator creation skipped", file=sys.stderr)
+    if not check_only:
+        print("A calrs account already exists: administrator creation skipped", file=sys.stderr)
     sys.exit(3)
+
+if check_only:
+    sys.exit(0)
 
 rc, output = run_with_password(
     cli("user", "create", "--email", email, "--name", name, "--admin", tty=True),

@@ -20,6 +20,14 @@
     "required": [
         "host"
     ],
+    "dependencies": {
+        "admin_email": [
+            "admin_password"
+        ],
+        "admin_password": [
+            "admin_email"
+        ]
+    },
     "properties": {
         "host": {
             "type": "string",

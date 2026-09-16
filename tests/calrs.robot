@@ -37,6 +37,21 @@ Check if calrs is installed correctly
     &{output} =    Evaluate    ${output}
     Set Suite Variable    ${module_id}    ${output.module_id}
 
+Check if a configuration without credentials is refused
+    # calrs gives the admin role to the first account that registers: the action
+    # refuses to publish an instance whose database holds nobody
+    ${errors} =    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false}
+    ...    decode_json=${FALSE}    rc_expected=2
+    Should Contain    ${errors}    calrs holds no account
+
+Check if half the administrator credentials are refused
+    # The agent exits 10 on a JSON Schema input validation failure
+    ${errors} =    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}"}
+    ...    decode_json=${FALSE}    rc_expected=10
+    Should Contain    ${errors}    admin_password
+
 Check if calrs can be configured
     Run task    module/${module_id}/configure-module
     ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}

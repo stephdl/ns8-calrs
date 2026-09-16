@@ -37,7 +37,9 @@ Launch `configure-module` with the following parameters:
   check, needed to reach a CalDAV server on a private address (see
   [Private CalDAV hosts](#private-caldav-hosts))
 - `admin_email`, `admin_name`, `admin_password`: first administrator account,
-  the password must be at least 12 characters
+  the password must be at least 12 characters. `admin_email` and
+  `admin_password` go together, and both are required while calrs holds no
+  account (see [Administrator account](#administrator-account))
 
 Example:
 
@@ -91,11 +93,17 @@ is never touched: `CALRS_ADMIN_EMAIL` is then left alone and the settings page
 keeps offering the form. The password is used once and never stored in the
 module environment.
 
-A `configure-module` run without `admin_email` and `admin_password` — the CLI
-with a host alone — starts the instance with no account and registration in
-whatever state calrs left it, which on a fresh volume means open. Whoever
-registers first becomes administrator. Create the account in the same run, as
-the settings page does.
+The action refuses to publish an instance nobody owns. The two fields go
+together — the input schema pairs them, so passing one alone fails validation —
+and when neither is given the action checks the database: an empty calrs holds
+no administrator, so `configure-module` stops there rather than starting an
+instance whose admin role goes to the first visitor who registers.
+
+A clone and a restore pass that check without credentials: the core rsyncs the
+volumes before the module reconfigures itself, and Restic restores them, so the
+accounts are already in place. The one case that stops is a restore of a backup
+taken from an instance that never had an account — configure that instance with
+`admin_email` and `admin_password` and the restore goes through.
 
 Further accounts are managed from the calrs admin dashboard, or with the CLI:
 
