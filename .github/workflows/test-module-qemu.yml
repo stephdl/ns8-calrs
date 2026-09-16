@@ -71,6 +71,11 @@ jobs:
 
   test:
     needs: [module, ui_tests]
+    # The screenshots are published as a comment, and a called workflow cannot
+    # hold more than its caller
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
