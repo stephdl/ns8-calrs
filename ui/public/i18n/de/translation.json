@@ -30,7 +30,6 @@
     "save": "Speichern",
     "calrs_fqdn": "calrs-Hostname (FQDN)",
     "lets_encrypt": "Let's-Encrypt-Zertifikat anfordern",
-    "http_to_https": "HTTPS erzwingen",
     "enabled": "Aktiviert",
     "disabled": "Deaktiviert",
     "advanced": "Erweitert",

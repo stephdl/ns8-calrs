@@ -90,20 +90,6 @@
                 />
               </cv-column>
             </cv-row>
-            <cv-toggle
-              value="httpToHttps"
-              :label="$t('settings.http_to_https')"
-              v-model="isHttpToHttpsEnabled"
-              :disabled="loading.getConfiguration || loading.configureModule"
-              class="mg-bottom"
-            >
-              <template slot="text-left">{{
-                $t("settings.disabled")
-              }}</template>
-              <template slot="text-right">{{
-                $t("settings.enabled")
-              }}</template>
-            </cv-toggle>
             <template v-if="!isAdminConfigured">
               <h4 class="mg-bottom">{{ $t("settings.admin_account") }}</h4>
               <NsInlineNotification
@@ -266,7 +252,6 @@ export default {
       isAdminConfigured: false,
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
-      isHttpToHttpsEnabled: true,
       loading: {
         getConfiguration: false,
         configureModule: false,
@@ -277,7 +262,6 @@ export default {
         configureModule: "",
         host: "",
         lets_encrypt: "",
-        http2https: "",
         mail_from: "",
         allow_private_hosts: "",
         admin_email: "",
@@ -405,7 +389,6 @@ export default {
       this.host = config.host;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isLetsEncryptCurrentlyEnabled = config.lets_encrypt;
-      this.isHttpToHttpsEnabled = config.http2https;
       this.mailFrom = config.mail_from;
       this.allowPrivateHosts = config.allow_private_hosts.join(", ");
       this.adminEmail = config.admin_email;
@@ -506,7 +489,6 @@ export default {
           data: {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
-            http2https: this.isHttpToHttpsEnabled,
             mail_from: this.mailFrom,
             allow_private_hosts: this.allowPrivateHosts
               ? this.allowPrivateHosts

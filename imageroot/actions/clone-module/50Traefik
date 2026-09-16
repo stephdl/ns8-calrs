@@ -13,7 +13,6 @@ private_hosts = os.environ.get("CALRS_ALLOW_PRIVATE_HOSTS", "")
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
     "lets_encrypt": os.environ["TRAEFIK_LETS_ENCRYPT"] == "True",
     "host": os.environ["TRAEFIK_HOST"],
-    "http2https": os.environ["TRAEFIK_HTTP2HTTPS"] == "True",
     "mail_from": os.environ.get("CALRS_MAIL_FROM", ""),
     "allow_private_hosts": private_hosts.split(",") if private_hosts else [],
     "admin_email": os.environ.get("CALRS_ADMIN_EMAIL", ""),

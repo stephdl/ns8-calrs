@@ -30,7 +30,6 @@
     "save": "Gorde",
     "calrs_fqdn": "calrs ostalari-izena (FQDN)",
     "lets_encrypt": "Eskatu Let's Encrypt ziurtagiria",
-    "http_to_https": "Behartu HTTPS",
     "enabled": "Gaituta",
     "disabled": "Desgaituta",
     "advanced": "Aurreratua",
