@@ -55,7 +55,7 @@ Check if calrs picked the smarthost up
 Discovery env should carry
     [Arguments]    ${line}
     ${output}  ${rc} =    Execute Command
-    ...    runagent -m ${module_id} cat $AGENT_STATE_DIR/discovery.env
+    ...    runagent -m ${module_id} bash -c 'cat $AGENT_STATE_DIR/discovery.env'
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     Should Contain    ${output}    ${line}
