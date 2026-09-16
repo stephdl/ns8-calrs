@@ -217,11 +217,11 @@ run in filename order:
 
 - `10__calrs.robot` installs and configures the module, and covers the refusals
   of `configure-module`, the backup dump and the booking page.
-- `15__ui.robot` logs into cluster-admin and captures the Status and Settings
-  pages of the module under `tests/outputs/browser/screenshot/`. Those two files
-  are what the software center entry ships as screenshots. The case is tagged
-  `ui` and is skipped unless `RUN_UI_TESTS=true`, since it needs the Playwright
-  image:
+- `15__ui.robot` logs into cluster-admin and captures the Status, Settings and
+  About pages of the module under `tests/outputs/browser/screenshot/`. Those
+  files are what the software center entry ships as screenshots. The case is
+  tagged `ui` and is skipped unless `RUN_UI_TESTS=true`, since it needs the
+  Playwright image:
 
       RUN_UI_TESTS=true ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/calrs:latest
 
