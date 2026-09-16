@@ -1,33 +1,7 @@
 *** Settings ***
 Library    SSHLibrary
 Resource    api.resource
-
-*** Variables ***
-# Any resolvable-looking name: the schema demands a dot, nothing resolves it.
-${TEST_HOST}    calrs.ns8-ci.test
-${ADMIN_EMAIL}    admin@ns8-ci.test
-${ADMIN_PASSWORD}    Nethesis,1234
-# calrs derives the username from the email local part
-${ADMIN_USERNAME}    admin
-${EVENT_SLUG}    ci-booking
-
-*** Keywords ***
-Run calrs cli
-    [Documentation]    Run the calrs CLI in an ephemeral container on the module volume
-    [Arguments]    ${arguments}
-    ${output}  ${rc} =    Execute Command
-    ...    runagent -m ${module_id} bash -c 'podman run --rm --network=none --volume calrs-data:/var/lib/calrs:z \${CALRS_IMAGE} ${arguments}'
-    ...    return_rc=True
-    RETURN    ${output}    ${rc}
-
-Fetch page
-    [Documentation]    Fetch a page through Traefik, following redirects
-    [Arguments]    ${path}
-    ${output}  ${rc} =    Execute Command
-    ...    curl -fkL -H "Host: ${TEST_HOST}" https://127.0.0.1${path}
-    ...    return_rc=True
-    Should Be Equal As Integers    ${rc}  0
-    RETURN    ${output}
+Resource    calrs.resource
 
 *** Test Cases ***
 Check if calrs is installed correctly
@@ -35,7 +9,7 @@ Check if calrs is installed correctly
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     &{output} =    Evaluate    ${output}
-    Set Suite Variable    ${module_id}    ${output.module_id}
+    Set Global Variable    ${module_id}    ${output.module_id}
 
 Check if a configuration without credentials is refused
     # calrs gives the admin role to the first account that registers: the action
@@ -134,8 +108,3 @@ Check if the database dump is consistent
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     Should Be Equal    ${output}    ok
-
-Check if calrs is removed correctly
-    ${rc} =    Execute Command    remove-module --no-preserve ${module_id}
-    ...    return_rc=True  return_stdout=False
-    Should Be Equal As Integers    ${rc}  0
