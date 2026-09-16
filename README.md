@@ -208,9 +208,14 @@ journalctl -t calrs-app -f
 
 ## Testing
 
-Test the module using the `test-module.sh` script:
+The runner lives in `ns8-ci-actions`, shared by every module. Install it once:
 
-    ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/calrs:latest
+    curl -o /tmp/run-ns8-tests https://raw.githubusercontent.com/stephdl/ns8-ci-actions/v1/scripts/test-module.sh
+    install -m 0755 -Z /tmp/run-ns8-tests ~/.local/bin
+
+Then, from this directory:
+
+    run-ns8-tests <NODE_ADDR> ghcr.io/stephdl/calrs:latest
 
 The tests are made using [Robot Framework](https://robotframework.org/), and
 run in filename order:
@@ -223,7 +228,7 @@ run in filename order:
   tagged `ui` and is skipped unless `RUN_UI_TESTS=true`, since it needs the
   Playwright image:
 
-      RUN_UI_TESTS=true ./test-module.sh <NODE_ADDR> ghcr.io/stephdl/calrs:latest
+      RUN_UI_TESTS=true run-ns8-tests <NODE_ADDR> ghcr.io/stephdl/calrs:latest
 
   In CI it runs on a renovate branch that touched `ui/` or `build-images.sh`, or
   on demand through the *Test module on QEMU* workflow, and the screenshots are

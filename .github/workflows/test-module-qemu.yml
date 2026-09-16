@@ -81,6 +81,8 @@ jobs:
       image_url: ${{ needs.module.outputs.image }}
       repo_ref: ${{ needs.module.outputs.sha }}
       version_tag: ${{ needs.module.outputs.tag }}
+      # Empty: run the shared runner of ns8-ci-actions rather than a copy here
+      script: ""
       # One leg only: each one that carries the flag comments on the pull request
       run_ui_tests: ${{ matrix.distro == 'rocky9' && needs.ui_tests.outputs.needed == 'true' }}
       # Guest RAM in MiB, 8192 by default. The runner has 15360 and needs some
