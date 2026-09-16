@@ -39,7 +39,7 @@ Check if calrs is installed correctly
 
 Check if calrs can be configured
     Run task    module/${module_id}/configure-module
-    ...    {"host":"${TEST_HOST}","http2https":false,"lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}
     ...    decode_json=${FALSE}
 
 Check if calrs configuration reads back
@@ -75,7 +75,7 @@ Check if the administrator account exists
 
 Check if a second configuration keeps a single administrator
     Run task    module/${module_id}/configure-module
-    ...    {"host":"${TEST_HOST}","http2https":false,"lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"${ADMIN_PASSWORD}"}
     ...    decode_json=${FALSE}
     ${output}  ${rc} =    Run calrs cli    user list
     Should Be Equal As Integers    ${rc}  0
@@ -85,7 +85,7 @@ Check if a second configuration keeps a single administrator
 Check if a short administrator password is refused
     # The agent exits 10 on a JSON Schema input validation failure
     ${errors} =    Run task    module/${module_id}/configure-module
-    ...    {"host":"${TEST_HOST}","http2https":false,"lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"short"}
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_email":"${ADMIN_EMAIL}","admin_name":"Administrator","admin_password":"short"}
     ...    decode_json=${FALSE}    rc_expected=10
     Should Contain    ${errors}    admin_password
     ${config} =    Run task    module/${module_id}/get-configuration    {}

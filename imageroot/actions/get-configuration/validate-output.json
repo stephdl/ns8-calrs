@@ -6,7 +6,6 @@
     "examples": [
         {
             "host": "calrs.domain.org",
-            "http2https": true,
             "lets_encrypt": true,
             "mail_from": "calrs@domain.org",
             "allow_private_hosts": [
@@ -18,7 +17,6 @@
     "type": "object",
     "required": [
         "host",
-        "http2https",
         "lets_encrypt",
         "mail_from",
         "allow_private_hosts",
@@ -34,11 +32,6 @@
             "type": "boolean",
             "title": "Let's Encrypt certificate",
             "description": "Request a valid Let's Encrypt certificate."
-        },
-        "http2https": {
-            "type": "boolean",
-            "title": "HTTP to HTTPS redirection",
-            "description": "Redirect all the HTTP requests to HTTPS"
         },
         "mail_from": {
             "type": "string",

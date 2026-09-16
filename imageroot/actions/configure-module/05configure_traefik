@@ -14,16 +14,13 @@ import os
 # If parsing fails, output everything to stderr
 data = json.load(sys.stdin)
 
-# Setup default values
-host = data["host"]
-h2hs = data.get("http2https", True)
-
 # Configure Traefik route for API
 set_route_data = {
     'instance': os.environ['MODULE_ID'],
     'url':  'http://127.0.0.1:' + os.environ["TCP_PORT"],
-    'host': host,
-    'http2https': h2hs,
+    'host': data["host"],
+    # HTTPS is mandatory: CALRS_BASE_URL is fixed to https://$TRAEFIK_HOST
+    'http2https': True,
     'lets_encrypt_check': True,
     'lets_encrypt_cleanup': True,
 }

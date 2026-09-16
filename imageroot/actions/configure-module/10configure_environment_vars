@@ -12,7 +12,6 @@ import agent
 data = json.load(sys.stdin)
 
 agent.set_env("TRAEFIK_HOST", data["host"])
-agent.set_env("TRAEFIK_HTTP2HTTPS", data.get("http2https", True))
 agent.set_env("CALRS_MAIL_FROM", data.get("mail_from", ""))
 agent.set_env("CALRS_ALLOW_PRIVATE_HOSTS", ",".join(data.get("allow_private_hosts", [])))
 

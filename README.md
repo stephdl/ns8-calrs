@@ -31,7 +31,6 @@ Let's assume the instance is named `calrs1`.
 Launch `configure-module` with the following parameters:
 
 - `host`: fully qualified domain name of the application (required)
-- `http2https`: enable or disable HTTP to HTTPS redirection (true/false)
 - `lets_encrypt`: request a Let's Encrypt certificate (true/false)
 - `mail_from`: sender address of booking messages, defaults to `noreply@<host>`
 - `allow_private_hosts`: host names allowed to bypass the calrs private address
@@ -45,7 +44,6 @@ Example:
 api-cli run configure-module --agent module/calrs1 --data - <<EOF
 {
   "host": "calrs.domain.com",
-  "http2https": true,
   "lets_encrypt": false,
   "mail_from": "calrs@domain.com",
   "allow_private_hosts": ["nextcloud.domain.com"],
