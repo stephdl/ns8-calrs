@@ -44,7 +44,7 @@
     "allow_private_hosts_helper": "Nomi host o indirizzi IP separati da virgole, ad esempio nextcloud.lan, 192.168.1.10",
     "allow_private_hosts_info": "calrs rifiuta un URL CalDAV il cui nome host si risolve in un indirizzo IP privato o riservato, una protezione contro il server-side request forgery. Aggiungi un host qui solo se il server di calendario si trova nella tua rete locale, ad esempio un Nextcloud interno. La corrispondenza è esatta e non distingue maiuscole e minuscole: nessun carattere jolly, nessun sottodominio.",
     "admin_account": "Account amministratore",
-    "admin_account_info": "calrs assegna il ruolo di amministratore al primo account registrato. Crealo qui: la registrazione viene poi chiusa.",
+    "admin_account_info": "calrs assegna il ruolo di amministratore al primo account registrato. Il modulo crea ora quell'account e chiude le registrazioni: tutti i campi sottostanti sono obbligatori. Questa sezione scompare una volta creato l'account.",
     "admin_email": "Email dell'amministratore",
     "admin_name": "Nome dell'amministratore",
     "admin_password": "Password dell'amministratore",
