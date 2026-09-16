@@ -33,16 +33,6 @@
               ref="host"
             >
             </cv-text-input>
-            <NsTextInput
-              :label="$t('settings.mail_from')"
-              placeholder="noreply@calrs.example.org"
-              v-model.trim="mailFrom"
-              :helper-text="$t('settings.mail_from_helper')"
-              :invalid-message="$t(error.mail_from)"
-              :disabled="stillLoading"
-              class="mg-bottom"
-              ref="mail_from"
-            ></NsTextInput>
             <NsToggle
               value="letsEncrypt"
               :label="core.$t('apps_lets_encrypt.request_https_certificate')"
@@ -141,9 +131,19 @@
             </template>
             <!-- advanced options -->
             <cv-accordion ref="accordion" class="maxwidth mg-bottom">
-              <cv-accordion-item :open="toggleAccordion[0]">
+              <cv-accordion-item :open="isAdvancedOpen">
                 <template slot="title">{{ $t("settings.advanced") }}</template>
                 <template slot="content">
+                  <NsTextInput
+                    :label="$t('settings.mail_from')"
+                    placeholder="noreply@calrs.example.org"
+                    v-model.trim="mailFrom"
+                    :helper-text="$t('settings.mail_from_helper')"
+                    :invalid-message="$t(error.mail_from)"
+                    :disabled="stillLoading"
+                    class="mg-bottom"
+                    ref="mail_from"
+                  ></NsTextInput>
                   <NsInlineNotification
                     kind="info"
                     :title="$t('settings.allow_private_hosts')"
@@ -229,6 +229,10 @@ import {
   PageTitleService,
 } from "@nethserver/ns8-ui-lib";
 
+// Fields living inside the collapsed advanced accordion: a validation error on
+// one of them must open it, otherwise the message is reported on a hidden input
+const ADVANCED_FIELDS = ["mail_from", "allow_private_hosts"];
+
 export default {
   name: "Settings",
   mixins: [
@@ -257,6 +261,7 @@ export default {
       adminPassword: "",
       adminPasswordConfirm: "",
       isAdminConfigured: false,
+      isAdvancedOpen: false,
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
       loading: {
@@ -472,8 +477,11 @@ export default {
         } else {
           // set i18n error message
           this.error[param] = this.$t("settings." + validationError.error);
+          if (ADVANCED_FIELDS.includes(param)) {
+            this.isAdvancedOpen = true;
+          }
           if (!focusAlreadySet) {
-            this.focusElement(param);
+            this.$nextTick(() => this.focusElement(param));
             focusAlreadySet = true;
           }
         }
