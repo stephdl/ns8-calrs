@@ -19,6 +19,5 @@ configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='conf
     "host": renv["TRAEFIK_HOST"],
     "mail_from": renv.get("CALRS_MAIL_FROM", ""),
     "allow_private_hosts": private_hosts.split(",") if private_hosts else [],
-    "admin_email": renv.get("CALRS_ADMIN_EMAIL", ""),
 })
 agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")

@@ -22,7 +22,15 @@ email = data.get("admin_email", "")
 password = data.get("admin_password", "")
 
 if not email or not password:
-    print("No administrator credentials provided: step skipped", file=sys.stderr)
+    # calrs gives the admin role to the first account that registers, so an
+    # instance started with an empty base belongs to whoever gets there first.
+    # The input schema pairs the two fields, so only the empty case reaches here.
+    check = subprocess.run(["create-admin", "--check"])
+    agent.assert_exp(
+        check.returncode == 3,
+        "calrs holds no account: pass admin_email and admin_password to create the administrator",
+    )
+    print("A calrs account already exists: administrator creation skipped", file=sys.stderr)
     sys.exit(0)
 
 name = data.get("admin_name", "") or email
@@ -32,4 +40,13 @@ proc = subprocess.run(
     input=password + "\n",
     text=True,
 )
+
+# 3 means an account was already there: nothing was created, record nothing
+if proc.returncode == 3:
+    sys.exit(0)
+
 agent.assert_exp(proc.returncode == 0, "The create-admin helper failed!")
+
+# Written here and not with the other variables: the UI reads it to tell that
+# the account exists, so an attempt that created nothing must not set it
+agent.set_env("CALRS_ADMIN_EMAIL", email)

@@ -37,7 +37,9 @@ Launch `configure-module` with the following parameters:
   check, needed to reach a CalDAV server on a private address (see
   [Private CalDAV hosts](#private-caldav-hosts))
 - `admin_email`, `admin_name`, `admin_password`: first administrator account,
-  the password must be at least 12 characters
+  the password must be at least 12 characters. `admin_email` and
+  `admin_password` go together, and both are required while calrs holds no
+  account (see [Administrator account](#administrator-account))
 
 Example:
 
@@ -79,12 +81,29 @@ subdomain matching. Keep the list as short as possible.
 
 ### Administrator account
 
-calrs grants the administrator role to the first account that registers. The
-module closes that window: when `admin_email` and `admin_password` are given,
-the account is created before the service starts and registration is disabled.
-The step is skipped when an account already exists, so an existing installation
-is never touched. The password is used once and never stored in the module
-environment.
+calrs grants the administrator role to the first account that registers, so an
+instance published with an empty database belongs to whoever gets there first.
+`configure-module` refuses to do that: `admin_email` and `admin_password` go
+together — the input schema pairs them, so passing one alone fails validation —
+and while calrs holds no account, both are required. `admin_name` stays free:
+left out, the account takes the email as its display name.
+
+When the credentials are given, the module creates the account before the
+service starts and closes open registration in the same run. That single write
+is the whole of the module's involvement: the registration setting then belongs
+to the calrs admin panel, and no later `configure-module` touches it.
+
+The creation is skipped when an account already exists — a clone, a restore, a
+second configure — and `CALRS_ADMIN_EMAIL` is recorded only after a real
+creation, so the variable never claims an account the module did not create.
+The password is used once and never stored in the module environment.
+
+A clone and a restore reconfigure themselves with no credentials and pass the
+check, because their data lands first: the core rsyncs the volumes, and Restic
+plus `40restore_database` put the database back. The accounts are already
+there. The one case that stops is restoring a backup taken from an instance
+that never had an account — configure it with `admin_email` and
+`admin_password` and the restore goes through.
 
 Further accounts are managed from the calrs admin dashboard, or with the CLI:
 
