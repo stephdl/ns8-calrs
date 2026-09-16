@@ -217,6 +217,9 @@ run in filename order:
 
 - `10__calrs.robot` installs and configures the module, and covers the refusals
   of `configure-module`, the backup dump and the booking page.
+- `15__ui.robot` logs into cluster-admin and captures the Status, Settings and
+  About pages of the module under `tests/outputs/browser/screenshot/`. Those
+  files are what the software center entry ships as screenshots.
 - `20__mail_stack.robot` installs an OpenLDAP account provider and `ns8-mail`,
   turns the antispam and antivirus filters off, and points the cluster smarthost
   at the mail server with `encrypt_smtp: none`.
