@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>NethServer/.github:ns8-automerge"
+  ],
+  "packageRules": [
+    {
+      "description": "ghcr.io returns no release timestamp, so minimumReleaseAge would block every update",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/**"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    }
   ]
 }
