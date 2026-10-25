@@ -57,7 +57,7 @@ Sign in
     [Arguments]    ${email}    ${password}
     # --resolve keeps the __Host- CSRF cookie bound to the virtual host name
     ${output}  ${rc} =    Execute Command
-    ...    jar=$(mktemp) && curl -sk -o /dev/null -c $jar --resolve ${TEST_HOST}:443:127.0.0.1 https://${TEST_HOST}/auth/login && token=$(awk '$6 == "__Host-calrs_csrf" {print $7}' $jar) && curl -sk -o /dev/null -w '%{redirect_url}' -b $jar --resolve ${TEST_HOST}:443:127.0.0.1 --data-urlencode "_csrf=$token" --data-urlencode "email=${email}" --data-urlencode "password=${password}" https://${TEST_HOST}/auth/login; rc=$?; rm -f $jar; exit $rc
+    ...    jar=$(mktemp) && curl -sk -o /dev/null -c $jar --resolve ${TEST_HOST}:443:127.0.0.1 https://${TEST_HOST}/auth/login && token=$(awk '$6 == "__Host-calrs_csrf" {print $7}' $jar) && curl -sk -o /dev/null -w '\%{redirect_url}' -b $jar --resolve ${TEST_HOST}:443:127.0.0.1 --data-urlencode "_csrf=$token" --data-urlencode "email=${email}" --data-urlencode "password=${password}" https://${TEST_HOST}/auth/login; rc=$?; rm -f $jar; exit $rc
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     RETURN    ${output}

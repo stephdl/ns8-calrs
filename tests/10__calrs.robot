@@ -93,7 +93,7 @@ Check if a weak administrator password is refused
     # Long enough for the schema, but without the classes the UI meter asks for
     ${errors} =    Run task    module/${module_id}/configure-module
     ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"aaaaaaaaaaaa"}
-    ...    decode_json=${FALSE}    rc_expected=10
+    ...    decode_json=${FALSE}    rc_expected=2
     Should Contain    ${errors}    admin_password_too_weak
 
 Check if the administrator password can be changed
