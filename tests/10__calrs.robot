@@ -89,6 +89,28 @@ Check if a short administrator password is refused
     ${config} =    Run task    module/${module_id}/get-configuration    {}
     Should Be Equal    ${config}[host]    ${TEST_HOST}
 
+Check if a weak administrator password is refused
+    # Long enough for the schema, but without the classes the UI meter asks for
+    ${errors} =    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"aaaaaaaaaaaa"}
+    ...    decode_json=${FALSE}    rc_expected=10
+    Should Contain    ${errors}    admin_password_too_weak
+
+Check if the administrator password can be changed
+    ${redirect} =    Sign in    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
+    Should End With    ${redirect}    /dashboard
+    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"${NEW_ADMIN_PASSWORD}"}
+    ...    decode_json=${FALSE}
+    ${redirect} =    Sign in    ${ADMIN_EMAIL}    ${NEW_ADMIN_PASSWORD}
+    Should End With    ${redirect}    /dashboard
+    ${redirect} =    Sign in    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
+    Should Not End With    ${redirect}    /dashboard
+    # Later suites sign in with the original password
+    [Teardown]    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"${ADMIN_PASSWORD}"}
+    ...    decode_json=${FALSE}
+
 Check if the guest booking page offers slots
     ${output}  ${rc} =    Run calrs cli
     ...    event-type create --title "CI booking" --slug ${EVENT_SLUG} --duration 30

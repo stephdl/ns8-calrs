@@ -12,7 +12,11 @@
 # create-admin --check only reports, with the same exit codes: 3 when calrs
 # already holds an account, 0 when the base is empty.
 #
-# `calrs user create` has no --password flag and reads it with rpassword, hence the PTY.
+# create-admin --set-password <email> changes the password of an existing
+# account, read on stdin. Exit 0 when it is changed, 2 on failure.
+#
+# `calrs user create` and `calrs user set-password` have no --password flag and
+# read it with rpassword, hence the PTY.
 #
 
 import os
@@ -23,9 +27,13 @@ import sys
 import agent
 
 check_only = sys.argv[1:2] == ["--check"]
+set_password = sys.argv[1:2] == ["--set-password"]
 
 if check_only:
     email = name = password = ""
+elif set_password:
+    email = sys.argv[2]
+    password = sys.stdin.readline().rstrip("\n")
 else:
     email = sys.argv[1]
     name = sys.argv[2]
@@ -59,6 +67,18 @@ def run_with_password(args, secret):
     os.close(master)
     return proc.wait(), output.decode(errors="replace")
 
+
+if set_password:
+    rc, output = run_with_password(cli("user", "set-password", email, tty=True), password)
+    # Upstream exits 0 on an unknown email, only the message tells the outcome
+    if rc != 0 or "Password updated for" not in output:
+        if "User not found" in output:
+            print(agent.SD_ERR + f"calrs account {email} not found", file=sys.stderr)
+        else:
+            print(agent.SD_ERR + "Password change failed: " + output, file=sys.stderr)
+        sys.exit(2)
+    print(f"Password of {email} changed", file=sys.stderr)
+    sys.exit(0)
 
 users = subprocess.run(cli("user", "list"), capture_output=True, text=True)
 if users.returncode != 0:
