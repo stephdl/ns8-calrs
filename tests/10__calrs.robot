@@ -5,7 +5,15 @@ Resource    calrs.resource
 
 *** Test Cases ***
 Check if calrs is installed correctly
-    ${output}  ${rc} =    Execute Command    add-module ${IMAGE_URL} 1
+    # The update scenario starts from the release published in the stephdl forge,
+    # then upgrades it to the image under test through update-module below.
+    IF    '${SCENARIO}' == 'update'
+        Enable the stephdl forge
+        ${image} =    Set Variable    calrs
+    ELSE
+        ${image} =    Set Variable    ${IMAGE_URL}
+    END
+    ${output}  ${rc} =    Execute Command    add-module ${image} 1
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     &{output} =    Evaluate    ${output}
@@ -79,6 +87,23 @@ Check if a second configuration keeps a single administrator
     Should Be Equal As Integers    ${rc}  0
     ${accounts} =    Evaluate    $output.count("@")
     Should Be Equal As Integers    ${accounts}  1
+
+Update calrs to the image under test
+    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
+    ${rc} =    Execute Command
+    ...    api-cli run update-module --data '{"force":true,"module_url":"${IMAGE_URL}","instances":["${module_id}"]}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if calrs works after the update
+    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
+    Wait Until Keyword Succeeds    20 times    3 seconds    Fetch page    /auth/login
+    ${config} =    Run task    module/${module_id}/get-configuration    {}
+    Should Be Equal    ${config}[host]    ${TEST_HOST}
+    Should Be Equal    ${config}[admin_email]    ${ADMIN_EMAIL}
+    ${output}  ${rc} =    Run calrs cli    user list
+    Should Be Equal As Integers    ${rc}  0
+    Should Contain    ${output}    ${ADMIN_EMAIL}
 
 Check if a short administrator password is refused
     # The agent exits 10 on a JSON Schema input validation failure

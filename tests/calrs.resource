@@ -19,11 +19,19 @@ ${GUEST_EMAIL}    u3@${MAIL_DOMAIN}
 ${PROBE_EMAIL}    u2@${MAIL_DOMAIN}
 ${ADMIN_PASSWORD}    Nethesis,1234
 ${NEW_ADMIN_PASSWORD}    Calrs-Ci,5678
+${SCENARIO}    install
 # calrs derives the username from the email local part
 ${ADMIN_USERNAME}    u1
 ${EVENT_SLUG}    ci-booking
 
 *** Keywords ***
+Enable the stephdl forge
+    # The module is published there, not in the default NS8 repositories.
+    ${rc} =    Execute Command
+    ...    api-cli run add-repository --data '{"name":"stephdl","url":"https://forge.de-labrusse.fr/ns8/updates/","status":true}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
 Run calrs cli
     [Documentation]    Run the calrs CLI in an ephemeral container on the module volume
     [Arguments]    ${arguments}
