@@ -80,15 +80,37 @@
                 />
               </cv-column>
             </cv-row>
+            <h4 class="mg-bottom">{{ $t("settings.admin_account") }}</h4>
+            <NsInlineNotification
+              kind="info"
+              :title="$t('settings.admin_account')"
+              :description="
+                isAdminConfigured
+                  ? $t('settings.admin_account_info_set', {
+                      email: adminEmail,
+                    })
+                  : $t('settings.admin_account_info')
+              "
+              :showCloseButton="false"
+              class="mg-bottom maxwidth"
+            />
+            <NsToggle
+              v-if="isAdminConfigured"
+              key="changeAdminPassword"
+              value="changeAdminPassword"
+              :label="$t('settings.change_admin_password')"
+              v-model="isChangePassword"
+              :disabled="stillLoading"
+              class="mg-bottom"
+            >
+              <template slot="text-left">{{
+                $t("settings.disabled")
+              }}</template>
+              <template slot="text-right">{{
+                $t("settings.enabled")
+              }}</template>
+            </NsToggle>
             <template v-if="!isAdminConfigured">
-              <h4 class="mg-bottom">{{ $t("settings.admin_account") }}</h4>
-              <NsInlineNotification
-                kind="info"
-                :title="$t('settings.admin_account')"
-                :description="$t('settings.admin_account_info')"
-                :showCloseButton="false"
-                class="mg-bottom maxwidth"
-              />
               <cv-text-input
                 :label="$t('settings.admin_email')"
                 placeholder="admin@example.org"
@@ -108,27 +130,29 @@
                 ref="admin_name"
               >
               </cv-text-input>
-              <NsTextInput
-                :label="$t('settings.admin_password')"
-                v-model="adminPassword"
-                :helper-text="$t('settings.admin_password_helper')"
-                :invalid-message="$t(error.admin_password)"
-                :disabled="stillLoading"
-                type="password"
-                minlength="12"
-                class="mg-bottom"
-                ref="admin_password"
-              ></NsTextInput>
-              <NsTextInput
-                :label="$t('settings.admin_password_confirm')"
-                v-model="adminPasswordConfirm"
-                :invalid-message="$t(error.adminPasswordConfirm)"
-                :disabled="stillLoading"
-                type="password"
-                class="mg-bottom"
-                ref="adminPasswordConfirm"
-              ></NsTextInput>
             </template>
+            <NsPasswordInput
+              v-if="isPasswordActive"
+              key="adminPassword"
+              v-model="adminPassword"
+              :newPasswordLabel="$t('settings.admin_password')"
+              :confirmPasswordLabel="$t('settings.admin_password_confirm')"
+              :newPasswordInvalidMessage="$t(error.admin_password)"
+              :confirmPasswordInvalidMessage="$t(error.admin_password_confirm)"
+              :passwordHideLabel="core.$t('password.hide_password')"
+              :passwordShowLabel="core.$t('password.show_password')"
+              :lengthLabel="core.$t('password.long_enough')"
+              :lowercaseLabel="core.$t('password.lowercase_letter')"
+              :uppercaseLabel="core.$t('password.uppercase_letter')"
+              :numberLabel="core.$t('password.number')"
+              :symbolLabel="core.$t('password.symbol')"
+              :equalLabel="core.$t('password.equal')"
+              :focus="focusPasswordField"
+              :minLength="12"
+              :disabled="stillLoading"
+              @passwordValidation="onAdminPasswordValidation"
+              class="mg-bottom maxwidth"
+            />
             <!-- advanced options -->
             <cv-accordion ref="accordion" class="maxwidth mg-bottom">
               <cv-accordion-item :open="isAdvancedOpen">
@@ -259,8 +283,10 @@ export default {
       adminEmail: "",
       adminName: "",
       adminPassword: "",
-      adminPasswordConfirm: "",
+      adminPasswordValidation: null,
+      focusPasswordField: { element: "" },
       isAdminConfigured: false,
+      isChangePassword: false,
       isAdvancedOpen: false,
       isLetsEncryptEnabled: false,
       isLetsEncryptCurrentlyEnabled: false,
@@ -279,7 +305,7 @@ export default {
         admin_email: "",
         admin_name: "",
         admin_password: "",
-        adminPasswordConfirm: "",
+        admin_password_confirm: "",
         getStatus: "",
       },
     };
@@ -292,6 +318,24 @@ export default {
         this.loading.configureModule ||
         this.loading.getStatus
       );
+    },
+    isPasswordActive() {
+      // before the configuration loads every instance looks unconfigured
+      if (this.loading.getConfiguration) {
+        return false;
+      }
+      return !this.isAdminConfigured || this.isChangePassword;
+    },
+  },
+  watch: {
+    adminPassword() {
+      this.error.admin_password = "";
+      this.error.admin_password_confirm = "";
+    },
+    isChangePassword() {
+      this.adminPassword = "";
+      this.error.admin_password = "";
+      this.error.admin_password_confirm = "";
     },
   },
   created() {
@@ -311,6 +355,9 @@ export default {
   methods: {
     goToCertificates() {
       this.core.$router.push("/settings/tls-certificates");
+    },
+    onAdminPasswordValidation(validation) {
+      this.adminPasswordValidation = validation;
     },
     async getStatus() {
       this.loading.getStatus = true;
@@ -405,6 +452,7 @@ export default {
       this.allowPrivateHosts = config.allow_private_hosts.join(", ");
       this.adminEmail = config.admin_email;
       this.isAdminConfigured = !!config.admin_email;
+      this.isChangePassword = false;
 
       this.loading.getConfiguration = false;
       this.focusElement("host");
@@ -440,24 +488,28 @@ export default {
           }
           isValidationOk = false;
         }
+      }
 
-        if (!this.adminPassword) {
-          this.error.admin_password = "common.required";
+      if (this.isPasswordActive) {
+        const v = this.adminPasswordValidation;
+        const isStrong =
+          v &&
+          v.isLengthOk &&
+          v.isLowercaseOk &&
+          v.isUppercaseOk &&
+          v.isNumberOk &&
+          v.isSymbolOk;
+        if (!isStrong) {
+          this.error.admin_password = "settings.admin_password_too_weak";
           if (isValidationOk) {
-            this.focusElement("admin_password");
+            this.focusPasswordField = { element: "newPassword" };
           }
           isValidationOk = false;
-        } else if (this.adminPassword.length < 12) {
-          // the calrs CLI rejects anything shorter
-          this.error.admin_password = "settings.password_too_short";
+        } else if (!v.isEqualOk) {
+          this.error.admin_password_confirm =
+            "settings.admin_password_mismatch";
           if (isValidationOk) {
-            this.focusElement("admin_password");
-          }
-          isValidationOk = false;
-        } else if (this.adminPassword !== this.adminPasswordConfirm) {
-          this.error.adminPasswordConfirm = "settings.password_mismatch";
-          if (isValidationOk) {
-            this.focusElement("adminPasswordConfirm");
+            this.focusPasswordField = { element: "confirmPassword" };
           }
           isValidationOk = false;
         }
@@ -494,7 +546,13 @@ export default {
           if (openAdvanced) {
             this.isAdvancedOpen = true;
           }
-          this.$nextTick(() => this.focusElement(focusParam));
+          this.$nextTick(() => {
+            if (focusParam === "admin_password") {
+              this.focusPasswordField = { element: "newPassword" };
+            } else {
+              this.focusElement(focusParam);
+            }
+          });
         });
       }
     },
@@ -543,8 +601,10 @@ export default {
               : {
                   admin_email: this.adminEmail,
                   admin_name: this.adminName,
-                  admin_password: this.adminPassword,
                 }),
+            ...(this.isPasswordActive
+              ? { admin_password: this.adminPassword }
+              : {}),
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
@@ -572,7 +632,6 @@ export default {
     configureModuleCompleted() {
       this.loading.configureModule = false;
       this.adminPassword = "";
-      this.adminPasswordConfirm = "";
 
       // reload configuration
       this.getConfiguration();

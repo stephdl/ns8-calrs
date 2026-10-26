@@ -7,10 +7,11 @@
 
 #
 # Create the administrator before the service starts: the calrs CLI migrates
-# a cold volume on its own.
+# a cold volume on its own. Once it exists, a password changes its password.
 #
 
 import json
+import os
 import subprocess
 import sys
 
@@ -20,11 +21,22 @@ data = json.load(sys.stdin)
 
 email = data.get("admin_email", "")
 password = data.get("admin_password", "")
+admin_email = os.getenv("CALRS_ADMIN_EMAIL", "")
+
+if admin_email and password:
+    proc = subprocess.run(
+        ["create-admin", "--set-password", admin_email],
+        input=password + "\n",
+        text=True,
+    )
+    agent.assert_exp(proc.returncode == 0, "The administrator password change failed!")
+    sys.exit(0)
 
 if not email or not password:
     # calrs gives the admin role to the first account that registers, so an
     # instance started with an empty base belongs to whoever gets there first.
-    # The input schema pairs the two fields, so only the empty case reaches here.
+    # The input schema requires a password with the email, so a lone password
+    # reaches here too: without a known administrator there is no one to change.
     check = subprocess.run(["create-admin", "--check"])
     # 0 and 3 answer the question, anything else means the helper itself broke
     agent.assert_exp(check.returncode in (0, 3), "The create-admin helper failed!")

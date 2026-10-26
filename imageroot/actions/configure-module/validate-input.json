@@ -23,9 +23,6 @@
     "dependencies": {
         "admin_email": [
             "admin_password"
-        ],
-        "admin_password": [
-            "admin_email"
         ]
     },
     "properties": {
@@ -82,7 +79,7 @@
         "admin_password": {
             "type": "string",
             "title": "Administrator password",
-            "description": "Password of the first administrator, at least 12 characters",
+            "description": "Password of the first administrator, at least 12 characters. Once the administrator exists, changes its password",
             "minLength": 12
         }
     }

@@ -5,7 +5,15 @@ Resource    calrs.resource
 
 *** Test Cases ***
 Check if calrs is installed correctly
-    ${output}  ${rc} =    Execute Command    add-module ${IMAGE_URL} 1
+    # The update scenario starts from the release published in the stephdl forge,
+    # then upgrades it to the image under test through update-module below.
+    IF    '${SCENARIO}' == 'update'
+        Enable the stephdl forge
+        ${image} =    Set Variable    calrs
+    ELSE
+        ${image} =    Set Variable    ${IMAGE_URL}
+    END
+    ${output}  ${rc} =    Execute Command    add-module ${image} 1
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
     &{output} =    Evaluate    ${output}
@@ -80,6 +88,23 @@ Check if a second configuration keeps a single administrator
     ${accounts} =    Evaluate    $output.count("@")
     Should Be Equal As Integers    ${accounts}  1
 
+Update calrs to the image under test
+    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
+    ${rc} =    Execute Command
+    ...    api-cli run update-module --data '{"force":true,"module_url":"${IMAGE_URL}","instances":["${module_id}"]}'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
+
+Check if calrs works after the update
+    Skip If    '${SCENARIO}' != 'update'    scenario is ${SCENARIO}, nothing to update
+    Wait Until Keyword Succeeds    20 times    3 seconds    Fetch page    /auth/login
+    ${config} =    Run task    module/${module_id}/get-configuration    {}
+    Should Be Equal    ${config}[host]    ${TEST_HOST}
+    Should Be Equal    ${config}[admin_email]    ${ADMIN_EMAIL}
+    ${output}  ${rc} =    Run calrs cli    user list
+    Should Be Equal As Integers    ${rc}  0
+    Should Contain    ${output}    ${ADMIN_EMAIL}
+
 Check if a short administrator password is refused
     # The agent exits 10 on a JSON Schema input validation failure
     ${errors} =    Run task    module/${module_id}/configure-module
@@ -88,6 +113,28 @@ Check if a short administrator password is refused
     Should Contain    ${errors}    admin_password
     ${config} =    Run task    module/${module_id}/get-configuration    {}
     Should Be Equal    ${config}[host]    ${TEST_HOST}
+
+Check if a weak administrator password is refused
+    # Long enough for the schema, but without the classes the UI meter asks for
+    ${errors} =    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"aaaaaaaaaaaa"}
+    ...    decode_json=${FALSE}    rc_expected=2
+    Should Contain    ${errors}    admin_password_too_weak
+
+Check if the administrator password can be changed
+    ${redirect} =    Sign in    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
+    Should End With    ${redirect}    /dashboard
+    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"${NEW_ADMIN_PASSWORD}"}
+    ...    decode_json=${FALSE}
+    ${redirect} =    Sign in    ${ADMIN_EMAIL}    ${NEW_ADMIN_PASSWORD}
+    Should End With    ${redirect}    /dashboard
+    ${redirect} =    Sign in    ${ADMIN_EMAIL}    ${ADMIN_PASSWORD}
+    Should Not End With    ${redirect}    /dashboard
+    # Later suites sign in with the original password
+    [Teardown]    Run task    module/${module_id}/configure-module
+    ...    {"host":"${TEST_HOST}","lets_encrypt":false,"admin_password":"${ADMIN_PASSWORD}"}
+    ...    decode_json=${FALSE}
 
 Check if the guest booking page offers slots
     ${output}  ${rc} =    Run calrs cli

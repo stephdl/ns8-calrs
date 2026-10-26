@@ -37,9 +37,11 @@ Launch `configure-module` with the following parameters:
   check, needed to reach a CalDAV server on a private address (see
   [Private CalDAV hosts](#private-caldav-hosts))
 - `admin_email`, `admin_name`, `admin_password`: first administrator account,
-  the password must be at least 12 characters. `admin_email` and
-  `admin_password` go together, and both are required while calrs holds no
-  account (see [Administrator account](#administrator-account))
+  the password must be at least 12 characters with lowercase and uppercase
+  letters, a number and a symbol. `admin_email` needs `admin_password`, and
+  both are required while calrs holds no account. Once the module has created
+  the administrator, `admin_password` alone changes its password (see
+  [Administrator account](#administrator-account))
 
 Example:
 
@@ -83,9 +85,9 @@ subdomain matching. Keep the list as short as possible.
 
 calrs grants the administrator role to the first account that registers, so an
 instance published with an empty database belongs to whoever gets there first.
-`configure-module` refuses to do that: `admin_email` and `admin_password` go
-together — the input schema pairs them, so passing one alone fails validation —
-and while calrs holds no account, both are required. `admin_name` stays free
+`configure-module` refuses to do that. The input schema fails an
+`admin_email` passed without `admin_password`, and while calrs holds no
+account, both are required. `admin_name` stays free
 for the API: left out, the account takes the email as its display name. The
 settings page asks for it all the same.
 
@@ -100,6 +102,12 @@ The creation is skipped when an account already exists — a clone, a restore, a
 second configure — and `CALRS_ADMIN_EMAIL` is recorded only after a real
 creation, so the variable never claims an account the module did not create.
 The password is used once and never stored in the module environment.
+
+Once `CALRS_ADMIN_EMAIL` is recorded, `admin_password` alone sets a new
+password on that account, a way back in when it is lost. The settings page
+shows it behind a *Change administrator password* toggle. The module runs
+`calrs user set-password` and fails when the account is gone, for instance
+after its email was changed in calrs. Sessions already open stay valid.
 
 A clone and a restore reconfigure themselves with no credentials and pass the
 check, because their data lands first: the core rsyncs the volumes, and Restic
